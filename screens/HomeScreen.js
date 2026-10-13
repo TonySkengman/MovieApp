@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import { searchMovies } from '../services/movieService';
+import MovieCard from '../components/MovieCard';
 
 export default function HomeScreen() {
   const [movies, setMovies] = useState([]);
@@ -44,15 +45,7 @@ export default function HomeScreen() {
         keyExtractor={(item) => item.imdbID}
         numColumns={2}
         renderItem={({ item }) => (
-          <View style={styles.movie}>
-            <Image
-              source={{ uri: item.Poster }}
-              style={styles.poster}
-            />
-
-            <Text style={styles.title}>{item.Title}</Text>
-            <Text style={styles.year}>{item.Year}</Text>
-          </View>
+          <MovieCard movie={item} />
         )}
       />
     </View>
