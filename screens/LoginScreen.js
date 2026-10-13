@@ -27,7 +27,8 @@ export default function LoginScreen({ navigation }) {
         secureTextEntry
       />
 
-      <Pressable style={styles.button}>
+      <Pressable style={styles.button}
+        onPress={() => navigation.replace('MainTabs')}>
         <Text style={styles.buttonText}>Log in</Text>
       </Pressable>
 
