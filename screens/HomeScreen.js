@@ -1,40 +1,60 @@
 
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
 
-export default function HomeScreen({ navigation }) {
+import { searchMovies } from '../services/movieService';
+
+export default function HomeScreen() {
+  const [movies, setMovies] = useState([]);
+
+  useEffect(() => {
+    async function loadMovies() {
+      const batman = await searchMovies('Batman');
+      const avengers = await searchMovies('Avengers');
+      const spiderMan = await searchMovies('Spider-Man');
+      const harryPotter = await searchMovies('Harry Potter');
+      const starWars = await searchMovies('Star Wars');
+
+      const allMovies = [
+        ...batman,
+        ...avengers,
+        ...spiderMan,
+        ...harryPotter,
+        ...starWars,
+      ];
+
+      setMovies(allMovies);
+    }
+
+    loadMovies();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.logo}>
-        The Watchlist
-      </Text>
+      <Text style={styles.heading}>Discover Movies</Text>
 
-      <Text style={styles.heading}>
-        Discover movies
-      </Text>
+      <FlatList
+        data={movies}
+        keyExtractor={(item) => item.imdbID}
+        numColumns={2}
+        renderItem={({ item }) => (
+          <View style={styles.movie}>
+            <Image
+              source={{ uri: item.Poster }}
+              style={styles.poster}
+            />
 
-      <Text style={styles.description}>
-        Find your next favorite movie.
-      </Text>
-
-      <View style={styles.movieList}>
-        <Text style={styles.movieTitle}>Interstellar</Text>
-        <Text style={styles.movieTitle}>Inception</Text>
-        <Text style={styles.movieTitle}>The Dark Knight</Text>
-      </View>
-
-      <Pressable
-        onPress={() => navigation.navigate('Login')}
-        style={{
-        backgroundColor: '#e50914',
-        padding: 15,
-        borderRadius: 8,
-        marginTop: 20,
-      }}
-    >
-        <Text style={{ color: '#ffffff', textAlign: 'center' }}>
-            Go to Login
-        </Text>
-        </Pressable>
+            <Text style={styles.title}>{item.Title}</Text>
+            <Text style={styles.year}>{item.Year}</Text>
+          </View>
+        )}
+      />
     </View>
   );
 }
@@ -43,34 +63,33 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#101010',
-    padding: 24,
-    justifyContent: 'center',
-  },
-  logo: {
-    color: '#e50914',
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 40,
+    padding: 16,
+    paddingTop: 60,
   },
   heading: {
     color: '#ffffff',
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
   },
-  description: {
-    color: '#aaaaaa',
-    fontSize: 16,
-    marginBottom: 30,
+  movie: {
+    flex: 1,
+    margin: 8,
   },
-  movieList: {
-    gap: 16,
-  },
-  movieTitle: {
-    color: '#ffffff',
-    backgroundColor: '#222222',
-    padding: 18,
+  poster: {
+    width: '100%',
+    height: 220,
     borderRadius: 8,
-    fontSize: 16,
+    backgroundColor: '#333333',
+  },
+  title: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    marginTop: 8,
+  },
+  year: {
+    color: '#aaaaaa',
+    marginTop: 4,
+    marginBottom: 12,
   },
 });
