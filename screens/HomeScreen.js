@@ -1,11 +1,11 @@
 
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>
-        Watchlist
+        The Watchlist
       </Text>
 
       <Text style={styles.heading}>
@@ -21,6 +21,20 @@ export default function HomeScreen() {
         <Text style={styles.movieTitle}>Inception</Text>
         <Text style={styles.movieTitle}>The Dark Knight</Text>
       </View>
+
+      <Pressable
+        onPress={() => navigation.navigate('Login')}
+        style={{
+        backgroundColor: '#e50914',
+        padding: 15,
+        borderRadius: 8,
+        marginTop: 20,
+      }}
+    >
+        <Text style={{ color: '#ffffff', textAlign: 'center' }}>
+            Go to Login
+        </Text>
+        </Pressable>
     </View>
   );
 }
