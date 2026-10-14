@@ -1,48 +1,59 @@
+const API_URL = 'http://10.0.2.2:3000/api/movies';
 
-const API_KEY = process.env.EXPO_PUBLIC_OMDB_API_KEY;
+export async function searchMovies(query = '', type = 'movie') {
+  try {
+    const params = new URLSearchParams();
 
-const BASE_URL = 'https://www.omdbapi.com/';
+    if (query.trim()) {
+      params.append('search', query.trim());
+    }
 
-export async function searchMovies(query, type = 'movie') {
-  const params = new URLSearchParams({
-    apikey: API_KEY,
-    s: query,
-    type,
-  });
+    if (type && type !== 'all') {
+      params.append('type', type);
+    }
 
-  const response = await fetch(`${BASE_URL}?${params}`);
+    const url = `${API_URL}?${params.toString()}`;
+    const response = await fetch(url);
 
-  if (!response.ok) {
-    throw new Error('Failed to connect to OMDb.');
+    if (!response.ok) {
+      throw new Error('Kunde inte hämta filmer.');
+    }
+
+    const movies = await response.json();
+
+    return movies.map((movie) => ({
+      ...movie,
+      Title: movie.title,
+      Year: String(movie.year),
+      Poster: movie.poster || '',
+      imdbID: movie._id,
+      Type: movie.type,
+    }));
+  } catch (error) {
+    console.error('searchMovies error:', error);
+    throw error;
   }
-
-  const data = await response.json();
-
-  if (data.Response === 'False') {
-    throw new Error(data.Error || 'No results found.');
-  }
-
-  return data.Search;
 }
 
-export async function getMovieDetails(imdbID) {
-  const params = new URLSearchParams({
-    apikey: API_KEY,
-    i: imdbID,
-    plot: 'full',
-  });
+export async function getMovieDetails(id) {
+  try {
+    const movies = await searchMovies('', 'all');
 
-  const response = await fetch(`${BASE_URL}?${params}`);
+    const movie = movies.find(
+      (item) => item._id === id || item.imdbID === id
+    );
 
-  if (!response.ok) {
-    throw new Error('Failed to fetch movie details.');
+    if (!movie) {
+      throw new Error('Filmen hittades inte.');
+    }
+
+    return {
+      ...movie,
+      Plot: movie.description,
+      Genre: movie.genres.join(', '),
+    };
+  } catch (error) {
+    console.error('getMovieDetails error:', error);
+    throw error;
   }
-
-  const data = await response.json();
-
-  if (data.Response === 'False') {
-    throw new Error(data.Error || 'Movie not found.');
-  }
-
-  return data;
 }

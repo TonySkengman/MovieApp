@@ -5,10 +5,6 @@ import HomeScreen from '../screens/HomeScreen';
 
 const Tab = createBottomTabNavigator();
 
-function SearchScreen() {
-  return <PlaceholderScreen title="Search" />;
-}
-
 function FavoritesScreen() {
   return <PlaceholderScreen title="Favorites" />;
 }
@@ -16,6 +12,12 @@ function FavoritesScreen() {
 function ProfileScreen() {
   return <PlaceholderScreen title="Profile" />;
 }
+
+
+function SearchScreen() {
+  return <PlaceholderScreen title="Search" />;
+}
+
 
 function PlaceholderScreen({ title }) {
   return (

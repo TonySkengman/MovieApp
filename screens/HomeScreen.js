@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import {
   View,
   Text,
-  Image,
   FlatList,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 
 import { searchMovies } from '../services/movieService';
@@ -13,24 +13,20 @@ import MovieCard from '../components/MovieCard';
 
 export default function HomeScreen() {
   const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function loadMovies() {
-      const batman = await searchMovies('Batman');
-      const avengers = await searchMovies('Avengers');
-      const spiderMan = await searchMovies('Spider-Man');
-      const harryPotter = await searchMovies('Harry Potter');
-      const starWars = await searchMovies('Star Wars');
-
-      const allMovies = [
-        ...batman,
-        ...avengers,
-        ...spiderMan,
-        ...harryPotter,
-        ...starWars,
-      ];
-
-      setMovies(allMovies);
+      try {
+        const results = await searchMovies('', 'all');
+        setMovies(results);
+      } catch (error) {
+        console.error('Could not load movies:', error);
+        setError('Kunde inte hämta filmer. Försök igen.');
+      } finally {
+        setLoading(false);
+      }
     }
 
     loadMovies();
@@ -40,14 +36,25 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <Text style={styles.heading}>Discover Movies</Text>
 
-      <FlatList
-        data={movies}
-        keyExtractor={(item) => item.imdbID}
-        numColumns={2}
-        renderItem={({ item }) => (
-          <MovieCard movie={item} />
-        )}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#ffffff" />
+      ) : error ? (
+        <Text style={styles.message}>{error}</Text>
+      ) : movies.length === 0 ? (
+        <Text style={styles.message}>
+          Inga filmer eller serier hittades.
+        </Text>
+      ) : (
+        <FlatList
+          data={movies}
+          keyExtractor={(item) => item._id}
+          numColumns={2}
+          renderItem={({ item }) => (
+            <MovieCard movie={item} />
+          )}
+          contentContainerStyle={styles.list}
+        />
+      )}
     </View>
   );
 }
@@ -65,24 +72,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  movie: {
-    flex: 1,
-    margin: 8,
+  list: {
+    paddingBottom: 20,
   },
-  poster: {
-    width: '100%',
-    height: 220,
-    borderRadius: 8,
-    backgroundColor: '#333333',
-  },
-  title: {
+  message: {
     color: '#ffffff',
-    fontWeight: 'bold',
-    marginTop: 8,
-  },
-  year: {
-    color: '#aaaaaa',
-    marginTop: 4,
-    marginBottom: 12,
+    fontSize: 16,
+    marginTop: 12,
   },
 });
