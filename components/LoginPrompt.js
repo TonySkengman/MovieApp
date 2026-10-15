@@ -14,7 +14,7 @@ export default function LoginPrompt({ message, onLogin }) {
       <Text style={styles.text}>{message}</Text>
 
       <Pressable style={styles.button} onPress={onLogin}>
-        <Text style={styles.buttonText}>Logga in</Text>
+        <Text style={styles.buttonText}>Log in</Text>
       </Pressable>
     </View>
   );

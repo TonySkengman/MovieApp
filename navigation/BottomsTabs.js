@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import LoginPrompt from '../components/LoginPrompt';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -14,8 +15,10 @@ function FavoritesScreen({ navigation }) {
   if (!isLoggedIn) {
     return (
       <LoginPrompt
-        message="Logga in för att se dina favoriter"
-        onLogin={() => navigation.getParent()?.navigate('Login')}
+        message="Log in to see your favorites"
+        onLogin={() => navigation.getParent()?.navigate('Login', {
+            returnTo: 'Favorites',
+        })}
       />
     );
   }
@@ -23,18 +26,23 @@ function FavoritesScreen({ navigation }) {
   return <PlaceholderScreen title="Favorites" />;
 }
 
-function ProfileScreen({ navigation }) {
+function ProfileTab({ navigation }) {
   const { isLoggedIn } = useAuth();
 
   if (!isLoggedIn) {
     return (
       <LoginPrompt
-        message="Logga in för att komma åt ditt konto"
-        onLogin={() => navigation.getParent()?.navigate('Login')}
+        message="Log in to access your account"
+        onLogin={() =>
+          navigation.getParent()?.navigate('Login', {
+            returnTo: 'Profile',
+          })
+        }
       />
     );
   }
-    return <PlaceholderScreen title="Profile" />;
+
+  return <ProfileScreen />;
 }
 
 
@@ -88,7 +96,7 @@ export default function BottomTabs() {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileTab}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
