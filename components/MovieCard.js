@@ -1,29 +1,47 @@
 
 import { View, Text, Image, StyleSheet } from 'react-native';
 
+import FavoriteButton from './FavoriteButton';
+
 export default function MovieCard({ movie }) {
   return (
     <View style={styles.movie}>
-      <Image
-        source={{ uri: movie.Poster }}
-        style={styles.poster}
-      />
-
-      <Text style={styles.title}>{movie.Title}</Text>
-
-      <View style={styles.yearTypeRow}>
-        <Text style={styles.year}>{movie.Year}</Text>
-
-        <Text style={styles.type}>
-          {movie.Type === 'series' ? 'TV Show' : 'Movie'}
-        </Text>
+      <View style={styles.posterContainer}>
+        <Image
+          source={{ uri: movie.Poster || movie.poster }}
+          style={styles.poster}
+        />
       </View>
 
-      {movie.genres?.length > 0 && (
-        <Text style={styles.genre}>
-          {movie.genres.join(', ')}
-        </Text>
-      )}
+      <View style={styles.movieInfo}>
+        <View style={styles.details}>
+          <Text style={styles.title}>
+            {movie.Title || movie.title}
+          </Text>
+
+          <View style={styles.yearTypeRow}>
+            <Text style={styles.year}>
+              {movie.Year || movie.year}
+            </Text>
+
+            <Text style={styles.type}>
+              {(movie.Type || movie.type) === 'series'
+                ? 'TV Show'
+                : 'Movie'}
+            </Text>
+          </View>
+
+          {movie.genres?.length > 0 && (
+            <Text style={styles.genre}>
+              {movie.genres.join(', ')}
+            </Text>
+          )}
+        </View>
+
+        <View style={styles.favoriteButton}>
+          <FavoriteButton movie={movie} />
+        </View>
+      </View>
     </View>
   );
 }
@@ -33,20 +51,33 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 8,
   },
+  posterContainer: {
+    position: 'relative',
+  },
   poster: {
     width: '100%',
     height: 220,
     borderRadius: 8,
     backgroundColor: '#333333',
   },
+  movieInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 4,
+    marginTop: 8,
+  },
+  details: {
+    flex: 1,
+  },
   title: {
     color: '#ffffff',
     fontWeight: 'bold',
-    marginTop: 8,
   },
   yearTypeRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap',
     gap: 8,
     marginTop: 4,
   },
@@ -63,5 +94,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 4,
     marginBottom: 12,
+  },
+  favoriteButton: {
+    marginTop: 0,
   },
 });

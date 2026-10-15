@@ -1,12 +1,19 @@
 
 import { View, Text, Image, StyleSheet } from 'react-native';
 
+import FavoriteButton from './FavoriteButton';
+
 export default function MovieRow({ item }) {
+  const poster = item.Poster || item.poster;
+  const title = item.Title || item.title;
+  const year = item.Year || item.year;
+  const type = item.Type || item.type;
+
   return (
     <View style={styles.movieCard}>
-      {item.Poster ? (
+      {poster ? (
         <Image
-          source={{ uri: item.Poster }}
+          source={{ uri: poster }}
           style={styles.poster}
           resizeMode="cover"
         />
@@ -17,20 +24,28 @@ export default function MovieRow({ item }) {
       )}
 
       <View style={styles.movieInfo}>
-        <Text style={styles.movieTitle}>{item.Title}</Text>
-
-        <Text style={styles.movieYear}>
-          {item.Year} ·{' '}
-          <Text style={styles.movieType}>
-            {item.Type === 'series' ? 'TV Show' : 'Movie'}
+        <View style={styles.details}>
+          <Text style={styles.movieTitle}>
+            {title}
           </Text>
-        </Text>
 
-        {item.genres?.length > 0 && (
-          <Text style={styles.movieGenres}>
-            {item.genres.join(', ')}
+          <Text style={styles.movieYear}>
+            {year} ·{' '}
+            <Text style={styles.movieType}>
+              {type === 'series' ? 'TV Show' : 'Movie'}
+            </Text>
           </Text>
-        )}
+
+          {item.genres?.length > 0 && (
+            <Text style={styles.movieGenres}>
+              {item.genres.join(', ')}
+            </Text>
+          )}
+        </View>
+
+        <View style={styles.favoriteButton}>
+          <FavoriteButton movie={item} />
+        </View>
       </View>
     </View>
   );
@@ -59,8 +74,13 @@ const styles = StyleSheet.create({
   },
   movieInfo: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 12,
-    justifyContent: 'center',
+    gap: 4,
+  },
+  details: {
+    flex: 1,
   },
   movieTitle: {
     color: '#ffffff',
@@ -79,5 +99,10 @@ const styles = StyleSheet.create({
   movieGenres: {
     color: '#cccccc',
     fontSize: 12,
+  },
+  favoriteButton: {
+    alignSelf: 'center',
+    marginTop: 8,
+    marginRight: 15,
   },
 });

@@ -6,25 +6,30 @@ import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
 import LoginPrompt from '../components/LoginPrompt';
 import ProfileScreen from '../screens/ProfileScreen';
+import FavoritesScreen from '../screens/FavoritesScreen';
 
 const Tab = createBottomTabNavigator();
 
-function FavoritesScreen({ navigation }) {
+
+function FavoritesTab({ navigation }) {
   const { isLoggedIn } = useAuth();
 
   if (!isLoggedIn) {
     return (
       <LoginPrompt
         message="Log in to see your favorites"
-        onLogin={() => navigation.getParent()?.navigate('Login', {
+        onLogin={() =>
+          navigation.getParent()?.navigate('Login', {
             returnTo: 'Favorites',
-        })}
+          })
+        }
       />
     );
   }
 
-  return <PlaceholderScreen title="Favorites" />;
+  return <FavoritesScreen />;
 }
+
 
 function ProfileTab({ navigation }) {
   const { isLoggedIn } = useAuth();
@@ -87,7 +92,7 @@ export default function BottomTabs() {
       />
       <Tab.Screen
         name="Favorites"
-        component={FavoritesScreen}
+        component={FavoritesTab}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="heart" size={size} color={color} />

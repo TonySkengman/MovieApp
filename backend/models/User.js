@@ -17,6 +17,12 @@ const userSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
+    favorites: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Movie',
+      },
+    ],
   },
   {
     timestamps: true,

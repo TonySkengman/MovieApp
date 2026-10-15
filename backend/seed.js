@@ -292,8 +292,6 @@ async function seedDatabase() {
   year: 2021,
 });
 
-console.log('Arcane from database:', arcane?.poster);
-
     console.log(`Added ${result.upsertedCount} new titles.`);
     console.log('Existing titles were left unchanged.');
   } catch (error) {
