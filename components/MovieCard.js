@@ -1,3 +1,4 @@
+
 import { View, Text, Image, StyleSheet } from 'react-native';
 
 export default function MovieCard({ movie }) {
@@ -9,7 +10,20 @@ export default function MovieCard({ movie }) {
       />
 
       <Text style={styles.title}>{movie.Title}</Text>
-      <Text style={styles.year}>{movie.Year}</Text>
+
+      <View style={styles.yearTypeRow}>
+        <Text style={styles.year}>{movie.Year}</Text>
+
+        <Text style={styles.type}>
+          {movie.Type === 'series' ? 'TV Show' : 'Movie'}
+        </Text>
+      </View>
+
+      {movie.genres?.length > 0 && (
+        <Text style={styles.genre}>
+          {movie.genres.join(', ')}
+        </Text>
+      )}
     </View>
   );
 }
@@ -30,8 +44,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 8,
   },
+  yearTypeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
   year: {
     color: '#aaaaaa',
+  },
+  type: {
+    color: '#e50914',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  genre: {
+    color: '#cccccc',
+    fontSize: 12,
     marginTop: 4,
     marginBottom: 12,
   },

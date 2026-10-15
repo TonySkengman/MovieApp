@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
+import SearchScreen from '../screens/SearchScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -11,11 +12,6 @@ function FavoritesScreen() {
 
 function ProfileScreen() {
   return <PlaceholderScreen title="Profile" />;
-}
-
-
-function SearchScreen() {
-  return <PlaceholderScreen title="Search" />;
 }
 
 

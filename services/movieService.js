@@ -1,6 +1,6 @@
 const API_URL = 'http://10.0.2.2:3000/api/movies';
 
-export async function searchMovies(query = '', type = 'movie') {
+export async function searchMovies(query = '', type = 'movie', genre = 'all') {
   try {
     const params = new URLSearchParams();
 
@@ -10,6 +10,10 @@ export async function searchMovies(query = '', type = 'movie') {
 
     if (type && type !== 'all') {
       params.append('type', type);
+    }
+
+    if (genre && genre !== 'all') {
+      params.append('genre', genre);
     }
 
     const url = `${API_URL}?${params.toString()}`;
