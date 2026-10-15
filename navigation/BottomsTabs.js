@@ -1,17 +1,40 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../context/AuthContext';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
+import LoginPrompt from '../components/LoginPrompt';
 
 const Tab = createBottomTabNavigator();
 
-function FavoritesScreen() {
+function FavoritesScreen({ navigation }) {
+  const { isLoggedIn } = useAuth();
+
+  if (!isLoggedIn) {
+    return (
+      <LoginPrompt
+        message="Logga in för att se dina favoriter"
+        onLogin={() => navigation.getParent()?.navigate('Login')}
+      />
+    );
+  }
+
   return <PlaceholderScreen title="Favorites" />;
 }
 
-function ProfileScreen() {
-  return <PlaceholderScreen title="Profile" />;
+function ProfileScreen({ navigation }) {
+  const { isLoggedIn } = useAuth();
+
+  if (!isLoggedIn) {
+    return (
+      <LoginPrompt
+        message="Logga in för att komma åt ditt konto"
+        onLogin={() => navigation.getParent()?.navigate('Login')}
+      />
+    );
+  }
+    return <PlaceholderScreen title="Profile" />;
 }
 
 
