@@ -23,7 +23,7 @@ export default function HomeScreen() {
         setMovies(results);
       } catch (error) {
         console.error('Could not load movies:', error);
-        setError('Kunde inte hämta filmer. Försök igen.');
+        setError('Could not load movies. Please try again later.');
       } finally {
         setLoading(false);
       }

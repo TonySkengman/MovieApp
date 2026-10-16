@@ -20,7 +20,7 @@ export async function searchMovies(query = '', type = 'movie', genre = 'all') {
     const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error('Kunde inte hämta filmer.');
+      throw new Error('Could not fetch movies. Please try again later.');
     }
 
     const movies = await response.json();
@@ -48,7 +48,7 @@ export async function getMovieDetails(id) {
     );
 
     if (!movie) {
-      throw new Error('Filmen hittades inte.');
+      throw new Error('Movie not found.');
     }
 
     return {

@@ -1,4 +1,3 @@
-
 import { useCallback, useState } from 'react';
 import {
   View,
@@ -6,6 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   Pressable,
+  Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -14,9 +14,11 @@ import ShareButton from '../components/ShareButton';
 import BackButton from '../components/BackButton';
 import MoviePoster from '../components/MoviePoster';
 import { getReviews } from '../services/reviewService';
+import { useAuth } from '../context/AuthContext';
 
 export default function MovieDetailsScreen({ route, navigation }) {
   const { movie } = route.params;
+  const { isLoggedIn } = useAuth();
 
   const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
@@ -29,6 +31,18 @@ export default function MovieDetailsScreen({ route, navigation }) {
   const genres = movie.genres || [];
   const description =
     movie.description || movie.Plot || 'No description available.';
+
+  function handleAddReview() {
+    if (!isLoggedIn) {
+      Alert.alert(
+        'Login required',
+        'You need to log in to add a review.'
+      );
+      return;
+    }
+
+    navigation.navigate('AddReview', { movie });
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -105,9 +119,7 @@ export default function MovieDetailsScreen({ route, navigation }) {
 
         <Pressable
           style={styles.addReviewButton}
-          onPress={() =>
-            navigation.navigate('AddReview', { movie })
-          }
+          onPress={handleAddReview}
           accessibilityRole="button"
         >
           <Text style={styles.addReviewButtonText}>
