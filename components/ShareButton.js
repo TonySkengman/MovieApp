@@ -5,10 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 export default function ShareButton({ movie }) {
   async function shareMovie() {
     try {
-      const title = movie.Title || movie.title;
-      const year = movie.Year || movie.year;
+      const title = movie.title;
+      const year = movie.year;
       const description =
-        movie.description || movie.Plot || 'No description available.';
+        movie.description || 'No description available.';
 
       await Share.share({
         message: `${title} (${year})\n\n${description}`,
@@ -23,7 +23,7 @@ export default function ShareButton({ movie }) {
       onPress={shareMovie}
       style={styles.button}
       accessibilityRole="button"
-      accessibilityLabel={`Share ${movie.Title || movie.title}`}
+      accessibilityLabel={`Share ${movie.title}`}
       hitSlop={8}
     >
       <Ionicons

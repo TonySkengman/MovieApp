@@ -24,13 +24,13 @@ export default function MovieDetailsScreen({ route, navigation }) {
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [reviewsError, setReviewsError] = useState('');
 
-  const poster = movie.Poster || movie.poster;
-  const title = movie.Title || movie.title;
-  const year = movie.Year || movie.year;
-  const type = movie.Type || movie.type;
+  const poster = movie.poster;
+  const title = movie.title;
+  const year = movie.year;
+  const type = movie.type;
   const genres = movie.genres || [];
   const description =
-    movie.description || movie.Plot || 'No description available.';
+    movie.description || 'No description available.';
 
   function handleAddReview() {
     if (!isLoggedIn) {

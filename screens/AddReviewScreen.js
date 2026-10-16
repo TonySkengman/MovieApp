@@ -23,13 +23,13 @@ export default function AddReviewScreen({ route, navigation }) {
   const [reviewText, setReviewText] = useState(review?.text ?? '');
   const [submitting, setSubmitting] = useState(false);
 
-  const poster = movie.Poster || movie.poster;
-  const title = movie.Title || movie.title;
-  const year = movie.Year || movie.year;
-  const type = movie.Type || movie.type;
+  const poster = movie.poster;
+  const title = movie.title;
+  const year = movie.year;
+  const type = movie.type;
   const genres = movie.genres || [];
   const description =
-    movie.description || movie.Plot || 'No description available.';
+    movie.description || 'No description available.';
 
   async function handleSubmitReview() {
     if (rating === 0) {

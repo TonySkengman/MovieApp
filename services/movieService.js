@@ -1,4 +1,6 @@
-const API_URL = 'http://10.0.2.2:3000/api/movies';
+import API_BASE_URL from "../constants/api";
+
+const API_URL = `${API_BASE_URL}/movies`;
 
 export async function searchMovies(query = '', type = 'movie', genre = 'all') {
   try {
@@ -23,41 +25,9 @@ export async function searchMovies(query = '', type = 'movie', genre = 'all') {
       throw new Error('Could not fetch movies. Please try again later.');
     }
 
-    const movies = await response.json();
-
-    return movies.map((movie) => ({
-      ...movie,
-      Title: movie.title,
-      Year: String(movie.year),
-      Poster: movie.poster || '',
-      imdbID: movie._id,
-      Type: movie.type,
-    }));
+    return await response.json();
   } catch (error) {
     console.error('searchMovies error:', error);
-    throw error;
-  }
-}
-
-export async function getMovieDetails(id) {
-  try {
-    const movies = await searchMovies('', 'all');
-
-    const movie = movies.find(
-      (item) => item._id === id || item.imdbID === id
-    );
-
-    if (!movie) {
-      throw new Error('Movie not found.');
-    }
-
-    return {
-      ...movie,
-      Plot: movie.description,
-      Genre: movie.genres.join(', '),
-    };
-  } catch (error) {
-    console.error('getMovieDetails error:', error);
     throw error;
   }
 }
