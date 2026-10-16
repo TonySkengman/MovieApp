@@ -10,6 +10,7 @@ import FavoritesScreen from '../screens/FavoritesScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import MovieDetailsScreen from '../screens/MovieDetailsScreen';
 import LoginPrompt from '../components/LoginPrompt';
+import AddReviewScreen from '../screens/AddReviewScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -19,6 +20,7 @@ function HomeStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="MovieDetails" component={MovieDetailsScreen} />
+      <Stack.Screen name="AddReview" component={AddReviewScreen} />
     </Stack.Navigator>
   );
 }
@@ -28,6 +30,7 @@ function SearchStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="SearchScreen" component={SearchScreen} />
       <Stack.Screen name="MovieDetails" component={MovieDetailsScreen} />
+      <Stack.Screen name="AddReview" component={AddReviewScreen} />
     </Stack.Navigator>
   );
 }
@@ -56,6 +59,7 @@ function FavoritesStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="FavoritesScreen" component={FavoritesTab} />
       <Stack.Screen name="MovieDetails" component={MovieDetailsScreen} />
+      <Stack.Screen name="AddReview" component={AddReviewScreen} />
     </Stack.Navigator>
   );
 }
