@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import {
   View,
@@ -10,6 +9,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import BackButton from '../components/BackButton';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 export default function LoginScreen({ navigation, route }) {
   const { login } = useAuth();
@@ -42,7 +42,12 @@ export default function LoginScreen({ navigation, route }) {
         navigation.replace('MainTabs');
       }
     } catch (error) {
-      setError(error.message || 'Unable to log in. Please try again.');
+      setError(
+        getUserFriendlyError(
+          error,
+          'Unable to log in. Please try again.'
+        )
+      );
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +55,6 @@ export default function LoginScreen({ navigation, route }) {
 
   return (
     <View style={styles.container}>
-
       <BackButton />
 
       <Text style={styles.logo}>THE WATCHLIST</Text>

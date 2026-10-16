@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import {
   View,
@@ -8,9 +7,12 @@ import {
   ActivityIndicator,
   ScrollView,
   FlatList,
+  Pressable,
 } from 'react-native';
+
 import { searchMovies } from '../services/movieService';
 import MovieRow from '../components/MovieRow';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 const types = [
   { label: 'All', value: 'all' },
@@ -40,6 +42,7 @@ export default function SearchScreen() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -60,7 +63,12 @@ export default function SearchScreen() {
         }
       } catch (err) {
         if (active) {
-          setError('Could not load titles. Please try again.');
+          setError(
+            getUserFriendlyError(
+              err,
+              'Could not load titles. Please try again.'
+            )
+          );
         }
       } finally {
         if (active) {
@@ -74,7 +82,7 @@ export default function SearchScreen() {
     return () => {
       active = false;
     };
-  }, [query, selectedType, selectedGenre]);
+  }, [query, selectedType, selectedGenre, retryCount]);
 
   return (
     <View style={styles.container}>
@@ -148,7 +156,17 @@ export default function SearchScreen() {
           style={styles.status}
         />
       ) : error ? (
-        <Text style={styles.statusText}>{error}</Text>
+        <View style={styles.statusContainer}>
+          <Text style={styles.statusText}>{error}</Text>
+
+          <Pressable
+            style={styles.retryButton}
+            onPress={() => setRetryCount((count) => count + 1)}
+            accessibilityRole="button"
+          >
+            <Text style={styles.retryButtonText}>TRY AGAIN</Text>
+          </Pressable>
+        </View>
       ) : movies.length === 0 ? (
         <Text style={styles.statusText}>No titles found.</Text>
       ) : (
@@ -231,5 +249,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
     fontSize: 15,
+  },
+  statusContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+  },
+  retryButton: {
+    backgroundColor: '#e50914',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  retryButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });

@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import {
   View,
@@ -17,6 +16,7 @@ import {
 import { getMyReviews, deleteReview } from '../services/reviewService';
 import BackButton from '../components/BackButton';
 import MoviePoster from '../components/MoviePoster';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 export default function MyReviewsScreen() {
   const navigation = useNavigation();
@@ -34,7 +34,12 @@ export default function MyReviewsScreen() {
       const data = await getMyReviews();
       setReviews(data);
     } catch (err) {
-      setError(err.message || 'Could not load your reviews.');
+      setError(
+        getUserFriendlyError(
+          err,
+          'Could not load your reviews. Please try again.'
+        )
+      );
     } finally {
       setLoading(false);
     }
@@ -80,7 +85,10 @@ export default function MyReviewsScreen() {
             } catch (err) {
               Alert.alert(
                 'Error',
-                err.message || 'Could not delete the review.'
+                getUserFriendlyError(
+                  err,
+                  'Could not delete the review. Please try again.'
+                )
               );
             } finally {
               setDeletingId(null);

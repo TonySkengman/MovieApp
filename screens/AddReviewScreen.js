@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import {
   View,
@@ -15,6 +14,7 @@ import FavoriteButton from '../components/FavoriteButton';
 import ShareButton from '../components/ShareButton';
 import MoviePoster from '../components/MoviePoster';
 import { addReview, updateReview } from '../services/reviewService';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 export default function AddReviewScreen({ route, navigation }) {
   const { movie, review, isEditing = false } = route.params;
@@ -66,8 +66,15 @@ export default function AddReviewScreen({ route, navigation }) {
       }
     } catch (error) {
       Alert.alert(
-        isEditing ? 'Could not update review' : 'Could not submit review',
-        error.message
+        isEditing
+          ? 'Could not update review'
+          : 'Could not submit review',
+        getUserFriendlyError(
+          error,
+          isEditing
+            ? 'Unable to update your review. Please try again.'
+            : 'Unable to submit your review. Please try again.'
+        )
       );
     } finally {
       setSubmitting(false);

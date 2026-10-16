@@ -1,23 +1,30 @@
-
 import {
   View,
   Text,
   FlatList,
   StyleSheet,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 
 import { useFavorites } from '../context/FavoritesContext';
 import MovieRow from '../components/MovieRow';
 
 export default function FavoritesScreen() {
-  const { favorites, isLoading } = useFavorites();
+  const {
+    favorites,
+    isLoading,
+    error,
+    reloadFavorites,
+  } = useFavorites();
 
   if (isLoading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#e50914" />
-        <Text style={styles.message}>Loading favorites...</Text>
+        <Text style={styles.message}>
+          Loading favorites...
+        </Text>
       </View>
     );
   }
@@ -26,7 +33,23 @@ export default function FavoritesScreen() {
     <View style={styles.container}>
       <Text style={styles.heading}>My Favorites</Text>
 
-      {favorites.length === 0 ? (
+      {error ? (
+        <View style={styles.center}>
+          <Text style={styles.errorMessage}>
+            {error}
+          </Text>
+
+          <Pressable
+            style={styles.retryButton}
+            onPress={reloadFavorites}
+            accessibilityRole="button"
+          >
+            <Text style={styles.retryButtonText}>
+              TRY AGAIN
+            </Text>
+          </Pressable>
+        </View>
+      ) : favorites.length === 0 ? (
         <View style={styles.center}>
           <Text style={styles.message}>
             You haven't added any favorites yet.
@@ -73,5 +96,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginTop: 12,
+  },
+  errorMessage: {
+    color: '#ff7777',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: '#e50914',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });
