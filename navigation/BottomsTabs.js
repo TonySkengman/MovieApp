@@ -1,15 +1,36 @@
+
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, Text, StyleSheet } from 'react-native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+
 import { useAuth } from '../context/AuthContext';
 import HomeScreen from '../screens/HomeScreen';
 import SearchScreen from '../screens/SearchScreen';
-import LoginPrompt from '../components/LoginPrompt';
-import ProfileScreen from '../screens/ProfileScreen';
 import FavoritesScreen from '../screens/FavoritesScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import MovieDetailsScreen from '../screens/MovieDetailsScreen';
+import LoginPrompt from '../components/LoginPrompt';
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
+function HomeStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="MovieDetails" component={MovieDetailsScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function SearchStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="SearchScreen" component={SearchScreen} />
+      <Stack.Screen name="MovieDetails" component={MovieDetailsScreen} />
+    </Stack.Navigator>
+  );
+}
 
 function FavoritesTab({ navigation }) {
   const { isLoggedIn } = useAuth();
@@ -19,7 +40,7 @@ function FavoritesTab({ navigation }) {
       <LoginPrompt
         message="Log in to see your favorites"
         onLogin={() =>
-          navigation.getParent()?.navigate('Login', {
+          navigation.getParent()?.getParent()?.navigate('Login', {
             returnTo: 'Favorites',
           })
         }
@@ -30,6 +51,14 @@ function FavoritesTab({ navigation }) {
   return <FavoritesScreen />;
 }
 
+function FavoritesStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="FavoritesScreen" component={FavoritesTab} />
+      <Stack.Screen name="MovieDetails" component={MovieDetailsScreen} />
+    </Stack.Navigator>
+  );
+}
 
 function ProfileTab({ navigation }) {
   const { isLoggedIn } = useAuth();
@@ -50,15 +79,6 @@ function ProfileTab({ navigation }) {
   return <ProfileScreen />;
 }
 
-
-function PlaceholderScreen({ title }) {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>{title}</Text>
-    </View>
-  );
-}
-
 export default function BottomTabs() {
   return (
     <Tab.Navigator
@@ -74,31 +94,34 @@ export default function BottomTabs() {
     >
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={HomeStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
         }}
       />
+
       <Tab.Screen
         name="Search"
-        component={SearchScreen}
+        component={SearchStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" size={size} color={color} />
           ),
         }}
       />
+
       <Tab.Screen
         name="Favorites"
-        component={FavoritesTab}
+        component={FavoritesStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="heart" size={size} color={color} />
           ),
         }}
       />
+
       <Tab.Screen
         name="Profile"
         component={ProfileTab}
@@ -111,16 +134,3 @@ export default function BottomTabs() {
     </Tab.Navigator>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#101010',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text: {
-    color: '#ffffff',
-    fontSize: 24,
-  },
-});

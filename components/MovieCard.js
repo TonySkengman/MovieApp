@@ -1,20 +1,29 @@
 
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import FavoriteButton from './FavoriteButton';
 
 export default function MovieCard({ movie }) {
+  const navigation = useNavigation();
+
+  function openDetails() {
+    navigation.navigate('MovieDetails', { movie });
+  }
+
   return (
     <View style={styles.movie}>
-      <View style={styles.posterContainer}>
-        <Image
-          source={{ uri: movie.Poster || movie.poster }}
-          style={styles.poster}
-        />
-      </View>
+      <Pressable onPress={openDetails}>
+        <View style={styles.posterContainer}>
+          <Image
+            source={{ uri: movie.Poster || movie.poster }}
+            style={styles.poster}
+          />
+        </View>
+      </Pressable>
 
       <View style={styles.movieInfo}>
-        <View style={styles.details}>
+        <Pressable style={styles.details} onPress={openDetails}>
           <Text style={styles.title}>
             {movie.Title || movie.title}
           </Text>
@@ -36,7 +45,7 @@ export default function MovieCard({ movie }) {
               {movie.genres.join(', ')}
             </Text>
           )}
-        </View>
+        </Pressable>
 
         <View style={styles.favoriteButton}>
           <FavoriteButton movie={movie} />

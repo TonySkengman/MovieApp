@@ -1,30 +1,39 @@
 
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import FavoriteButton from './FavoriteButton';
 
 export default function MovieRow({ item }) {
+  const navigation = useNavigation();
+
   const poster = item.Poster || item.poster;
   const title = item.Title || item.title;
   const year = item.Year || item.year;
   const type = item.Type || item.type;
 
+  function openDetails() {
+    navigation.navigate('MovieDetails', { movie: item });
+  }
+
   return (
     <View style={styles.movieCard}>
-      {poster ? (
-        <Image
-          source={{ uri: poster }}
-          style={styles.poster}
-          resizeMode="cover"
-        />
-      ) : (
-        <View style={[styles.poster, styles.posterPlaceholder]}>
-          <Text style={styles.placeholderText}>No image</Text>
-        </View>
-      )}
+      <Pressable onPress={openDetails}>
+        {poster ? (
+          <Image
+            source={{ uri: poster }}
+            style={styles.poster}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={[styles.poster, styles.posterPlaceholder]}>
+            <Text style={styles.placeholderText}>No image</Text>
+          </View>
+        )}
+      </Pressable>
 
       <View style={styles.movieInfo}>
-        <View style={styles.details}>
+        <Pressable style={styles.details} onPress={openDetails}>
           <Text style={styles.movieTitle}>
             {title}
           </Text>
@@ -41,7 +50,7 @@ export default function MovieRow({ item }) {
               {item.genres.join(', ')}
             </Text>
           )}
-        </View>
+        </Pressable>
 
         <View style={styles.favoriteButton}>
           <FavoriteButton movie={item} />

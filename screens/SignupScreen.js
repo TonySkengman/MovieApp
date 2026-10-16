@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../context/AuthContext';
+import BackButton from '../components/BackButton';
 
 export default function SignupScreen({ navigation }) {
   const { register } = useAuth();
@@ -47,12 +48,8 @@ export default function SignupScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Pressable
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.backText}>← Back</Text>
-      </Pressable>
+
+      <BackButton />
 
       <Text style={styles.logo}>THE WATCHLIST</Text>
 
@@ -122,15 +119,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#101010',
     justifyContent: 'center',
     padding: 24,
-  },
-  backButton: {
-    position: 'absolute',
-    top: 75,
-    left: 24,
-  },
-  backText: {
-    color: '#ffffff',
-    fontSize: 16,
   },
   logo: {
     color: '#e50914',
