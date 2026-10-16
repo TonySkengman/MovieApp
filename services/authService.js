@@ -1,7 +1,6 @@
 
 import * as SecureStore from 'expo-secure-store';
-
-const API_BASE_URL = 'http://10.0.2.2:3000/api';
+import API_BASE_URL from '../constants/api';
 
 async function authRequest(endpoint, username, password) {
   const response = await fetch(`${API_BASE_URL}/auth/${endpoint}`, {

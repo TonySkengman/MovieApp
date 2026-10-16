@@ -1,7 +1,6 @@
 
 import { getToken } from './authService';
-
-const API_BASE_URL = 'http://10.0.2.2:3000/api';
+import API_BASE_URL from '../constants/api';
 
 async function reviewRequest(endpoint, options = {}) {
   const token = await getToken();
