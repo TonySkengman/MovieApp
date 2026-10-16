@@ -1,17 +1,11 @@
+import { createContext, useContext, useEffect, useState } from "react";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
-
-import { useAuth } from './AuthContext';
+import { useAuth } from "./AuthContext";
 import {
   getFavorites,
   addFavorite,
   removeFavorite,
-} from '../services/favoritesService';
+} from "../services/favoriteService";
 
 const FavoritesContext = createContext(null);
 
@@ -35,7 +29,7 @@ export function FavoritesProvider({ children }) {
         const data = await getFavorites();
         setFavorites(data);
       } catch (error) {
-        console.error('Failed to load favorites:', error);
+        console.error("Failed to load favorites:", error);
       } finally {
         setIsLoading(false);
       }
@@ -45,35 +39,27 @@ export function FavoritesProvider({ children }) {
   }, [isLoggedIn]);
 
   function isFavorite(movieId) {
-    return favorites.some(
-      (movie) => movie._id === movieId
-    );
+    return favorites.some((movie) => movie._id === movieId);
   }
 
   async function toggleFavorite(movie) {
     const movieId = movie._id;
 
     if (!movieId) {
-      throw new Error('Movie ID is missing.');
+      throw new Error("Movie ID is missing.");
     }
 
     if (isFavorite(movieId)) {
       await removeFavorite(movieId);
 
       setFavorites((currentFavorites) =>
-        currentFavorites.filter(
-          (favorite) => favorite._id !== movieId
-        )
+        currentFavorites.filter((favorite) => favorite._id !== movieId),
       );
     } else {
       await addFavorite(movieId);
 
       setFavorites((currentFavorites) => {
-        if (
-          currentFavorites.some(
-            (favorite) => favorite._id === movieId
-          )
-        ) {
+        if (currentFavorites.some((favorite) => favorite._id === movieId)) {
           return currentFavorites;
         }
 

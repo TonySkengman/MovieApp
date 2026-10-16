@@ -52,3 +52,7 @@ export function deleteReview(reviewId) {
     method: 'DELETE',
   });
 }
+
+export function getMyReviews() {
+  return reviewRequest('/my');
+}

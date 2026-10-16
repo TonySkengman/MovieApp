@@ -7,6 +7,20 @@ import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
+router.get('/my', authenticateToken, async (req, res) => {
+  try {
+    const reviews = await Review.find({
+      user: req.user._id,
+    });
+
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({
+      message: 'Could not fetch your reviews.',
+    });
+  }
+});
+
 router.get('/:movieId', async (req, res) => {
   try {
     const { movieId } = req.params;
