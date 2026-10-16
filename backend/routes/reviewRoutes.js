@@ -9,9 +9,9 @@ const router = express.Router();
 
 router.get('/my', authenticateToken, async (req, res) => {
   try {
-    const reviews = await Review.find({
-      user: req.user._id,
-    });
+    const reviews = await Review.find({ user: req.user._id })
+      .populate('movie', 'title year poster type genres')
+      .sort({ createdAt: -1 });
 
     res.json(reviews);
   } catch (error) {
@@ -20,6 +20,7 @@ router.get('/my', authenticateToken, async (req, res) => {
     });
   }
 });
+
 
 router.get('/:movieId', async (req, res) => {
   try {

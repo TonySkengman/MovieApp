@@ -13,13 +13,13 @@ import {
 
 import BackButton from '../components/BackButton';
 import FavoriteButton from '../components/FavoriteButton';
-import { addReview } from '../services/reviewService';
+import { addReview, updateReview } from '../services/reviewService';
 
 export default function AddReviewScreen({ route, navigation }) {
-  const { movie } = route.params;
+  const { movie, review, isEditing = false } = route.params;
 
-  const [rating, setRating] = useState(0);
-  const [reviewText, setReviewText] = useState('');
+  const [rating, setRating] = useState(review?.rating ?? 0);
+  const [reviewText, setReviewText] = useState(review?.text ?? '');
   const [submitting, setSubmitting] = useState(false);
 
   const poster = movie.Poster || movie.poster;
@@ -44,16 +44,30 @@ export default function AddReviewScreen({ route, navigation }) {
     try {
       setSubmitting(true);
 
-      await addReview(movie._id, rating, reviewText.trim());
+      if (isEditing) {
+        await updateReview(review._id, rating, reviewText.trim());
 
-      Alert.alert('Success', 'Your review has been submitted.', [
-        {
-          text: 'OK',
-          onPress: () => navigation.goBack(),
-        },
-      ]);
+        Alert.alert('Success', 'Your review has been updated.', [
+          {
+            text: 'OK',
+            onPress: () => navigation.goBack(),
+          },
+        ]);
+      } else {
+        await addReview(movie._id, rating, reviewText.trim());
+
+        Alert.alert('Success', 'Your review has been submitted.', [
+          {
+            text: 'OK',
+            onPress: () => navigation.goBack(),
+          },
+        ]);
+      }
     } catch (error) {
-      Alert.alert('Could not submit review', error.message);
+      Alert.alert(
+        isEditing ? 'Could not update review' : 'Could not submit review',
+        error.message
+      );
     } finally {
       setSubmitting(false);
     }
@@ -111,7 +125,9 @@ export default function AddReviewScreen({ route, navigation }) {
         <Text style={styles.sectionTitle}>Overview</Text>
         <Text style={styles.description}>{description}</Text>
 
-        <Text style={styles.sectionTitle}>Add Review</Text>
+        <Text style={styles.sectionTitle}>
+          {isEditing ? 'Edit Review' : 'Add Review'}
+        </Text>
 
         <Text style={styles.label}>Your rating</Text>
 
@@ -164,7 +180,13 @@ export default function AddReviewScreen({ route, navigation }) {
           accessibilityRole="button"
         >
           <Text style={styles.submitButtonText}>
-            {submitting ? 'Submitting...' : 'Submit Review'}
+            {submitting
+              ? isEditing
+                ? 'Saving...'
+                : 'Submitting...'
+              : isEditing
+                ? 'Save Changes'
+                : 'Submit Review'}
           </Text>
         </Pressable>
       </View>

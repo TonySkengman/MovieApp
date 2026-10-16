@@ -1,4 +1,3 @@
-
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,6 +10,7 @@ import ProfileScreen from '../screens/ProfileScreen';
 import MovieDetailsScreen from '../screens/MovieDetailsScreen';
 import LoginPrompt from '../components/LoginPrompt';
 import AddReviewScreen from '../screens/AddReviewScreen';
+import MyReviewsScreen from '../screens/MyReviewsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -80,7 +80,17 @@ function ProfileTab({ navigation }) {
     );
   }
 
-  return <ProfileScreen />;
+  return <ProfileStack />;
+}
+
+function ProfileStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+      <Stack.Screen name="MyReviews" component={MyReviewsScreen} />
+      <Stack.Screen name="AddReview" component={AddReviewScreen} />
+    </Stack.Navigator>
+  );
 }
 
 export default function BottomTabs() {

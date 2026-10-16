@@ -1,13 +1,14 @@
 
 import { useState, useCallback } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { getMyReviews } from '../services/reviewService';
 import { getFavorites } from '../services/favoriteService';
 
-export default function ProfileScreen({ navigation }) {
+export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const navigation = useNavigation();
 
   const [reviewCount, setReviewCount] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
@@ -122,7 +123,12 @@ export default function ProfileScreen({ navigation }) {
       <Text style={styles.sectionTitle}>My Activity</Text>
 
       <View style={styles.statsContainer}>
-        <View style={styles.statsCard}>
+        <Pressable
+          style={styles.statsCard}
+          onPress={() => navigation.navigate('MyReviews')}
+          accessibilityRole="button"
+          accessibilityLabel={`Reviews Made: ${reviewCount ?? 'unknown'}`}
+        >
           <View style={styles.statsIcon}>
             <Text style={styles.reviewIcon}>★</Text>
           </View>
@@ -131,9 +137,14 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.statsValue}>
             {reviewCount === null ? '—' : reviewCount}
           </Text>
-        </View>
+        </Pressable>
 
-        <View style={styles.statsCard}>
+        <Pressable
+          style={styles.statsCard}
+          onPress={() => navigation.navigate('Favorites')}
+          accessibilityRole="button"
+          accessibilityLabel={`Favorites: ${favoriteCount ?? 'unknown'}`}
+        >
           <View style={styles.statsIcon}>
             <Text style={styles.favoriteIcon}>♥</Text>
           </View>
@@ -142,7 +153,7 @@ export default function ProfileScreen({ navigation }) {
           <Text style={styles.statsValue}>
             {favoriteCount === null ? '—' : favoriteCount}
           </Text>
-        </View>
+        </Pressable>
 
         <View style={styles.statsCard}>
           <View style={styles.statsIcon}>
