@@ -1,8 +1,8 @@
 
-import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
 import FavoriteButton from './FavoriteButton';
+import MoviePoster from './MoviePoster';
 
 export default function MovieCard({ movie }) {
   const navigation = useNavigation();
@@ -15,9 +15,11 @@ export default function MovieCard({ movie }) {
     <View style={styles.movie}>
       <Pressable onPress={openDetails}>
         <View style={styles.posterContainer}>
-          <Image
-            source={{ uri: movie.Poster || movie.poster }}
-            style={styles.poster}
+          <MoviePoster
+            uri={movie.Poster || movie.poster}
+            width="100%"
+            height={220}
+            borderRadius={8}
           />
         </View>
       </Pressable>
@@ -62,12 +64,6 @@ const styles = StyleSheet.create({
   },
   posterContainer: {
     position: 'relative',
-  },
-  poster: {
-    width: '100%',
-    height: 220,
-    borderRadius: 8,
-    backgroundColor: '#333333',
   },
   movieInfo: {
     flexDirection: 'row',

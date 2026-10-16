@@ -10,7 +10,7 @@ const router = express.Router();
 router.get('/my', authenticateToken, async (req, res) => {
   try {
     const reviews = await Review.find({ user: req.user._id })
-      .populate('movie', 'title year poster type genres')
+      .populate('movie', 'title year poster type genres description')
       .sort({ createdAt: -1 });
 
     res.json(reviews);

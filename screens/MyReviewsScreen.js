@@ -3,19 +3,20 @@ import { useState, useCallback } from 'react';
 import {
   View,
   Text,
-  Image,
   FlatList,
   Pressable,
   ActivityIndicator,
   Alert,
   StyleSheet,
 } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import {
-  getMyReviews,
-  deleteReview,
-} from '../services/reviewService';
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
+
+import { getMyReviews, deleteReview } from '../services/reviewService';
 import BackButton from '../components/BackButton';
+import MoviePoster from '../components/MoviePoster';
 
 export default function MyReviewsScreen() {
   const navigation = useNavigation();
@@ -95,17 +96,13 @@ export default function MyReviewsScreen() {
 
     return (
       <View style={styles.reviewCard}>
-        {movie?.poster ? (
-          <Image
-            source={{ uri: movie.poster }}
-            style={styles.poster}
-            resizeMode="cover"
-          />
-        ) : (
-          <View style={[styles.poster, styles.posterPlaceholder]}>
-            <Text style={styles.placeholderText}>No poster</Text>
-          </View>
-        )}
+        <MoviePoster
+          uri={movie?.poster}
+          width={100}
+          height={150}
+          placeholderText="No poster"
+          placeholderFontSize={12}
+        />
 
         <View style={styles.reviewContent}>
           <Text style={styles.movieTitle}>
@@ -146,7 +143,10 @@ export default function MyReviewsScreen() {
               accessibilityRole="button"
             >
               {deletingId === item._id ? (
-                <ActivityIndicator color="#ffffff" size="small" />
+                <ActivityIndicator
+                  color="#ffffff"
+                  size="small"
+                />
               ) : (
                 <Text style={styles.deleteButtonText}>
                   Delete review
@@ -161,13 +161,19 @@ export default function MyReviewsScreen() {
 
   return (
     <View style={styles.container}>
-    <BackButton />
+      <BackButton />
+
       <Text style={styles.title}>My Reviews</Text>
 
       {loading ? (
         <View style={styles.centerContent}>
-          <ActivityIndicator size="large" color="#e50914" />
-          <Text style={styles.statusText}>Loading reviews...</Text>
+          <ActivityIndicator
+            size="large"
+            color="#e50914"
+          />
+          <Text style={styles.statusText}>
+            Loading reviews...
+          </Text>
         </View>
       ) : error ? (
         <View style={styles.centerContent}>
@@ -178,7 +184,9 @@ export default function MyReviewsScreen() {
             onPress={loadReviews}
             accessibilityRole="button"
           >
-            <Text style={styles.retryButtonText}>Try again</Text>
+            <Text style={styles.retryButtonText}>
+              Try again
+            </Text>
           </Pressable>
         </View>
       ) : (
@@ -194,7 +202,9 @@ export default function MyReviewsScreen() {
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <View style={styles.centerContent}>
-              <Text style={styles.emptyTitle}>No reviews yet</Text>
+              <Text style={styles.emptyTitle}>
+                No reviews yet
+              </Text>
               <Text style={styles.statusText}>
                 Your movie reviews will appear here.
               </Text>
@@ -233,22 +243,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 12,
     gap: 14,
-  },
-  poster: {
-    width: 100,
-    height: 150,
-    borderRadius: 6,
-    backgroundColor: '#292929',
-  },
-  posterPlaceholder: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 6,
-  },
-  placeholderText: {
-    color: '#888888',
-    fontSize: 12,
-    textAlign: 'center',
   },
   reviewContent: {
     flex: 1,

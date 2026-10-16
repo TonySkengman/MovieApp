@@ -3,7 +3,6 @@ import { useCallback, useState } from 'react';
 import {
   View,
   Text,
-  Image,
   ScrollView,
   StyleSheet,
   Pressable,
@@ -12,6 +11,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 import FavoriteButton from '../components/FavoriteButton';
 import BackButton from '../components/BackButton';
+import MoviePoster from '../components/MoviePoster';
 import { getReviews } from '../services/reviewService';
 
 export default function MovieDetailsScreen({ route, navigation }) {
@@ -72,19 +72,12 @@ export default function MovieDetailsScreen({ route, navigation }) {
         <View style={styles.headerSpacer} />
       </View>
 
-      {poster ? (
-        <Image
-          source={{ uri: poster }}
-          style={styles.poster}
-          resizeMode="cover"
-        />
-      ) : (
-        <View style={styles.posterPlaceholder}>
-          <Text style={styles.placeholderText}>
-            No image available
-          </Text>
-        </View>
-      )}
+      <MoviePoster
+        uri={poster}
+        width="100%"
+        height={420}
+        placeholderHeight={300}
+      />
 
       <View style={styles.content}>
         <View style={styles.titleRow}>
@@ -181,21 +174,6 @@ const styles = StyleSheet.create({
   },
   headerSpacer: {
     width: 40,
-  },
-  poster: {
-    width: '100%',
-    height: 420,
-    backgroundColor: '#222222',
-  },
-  posterPlaceholder: {
-    height: 300,
-    backgroundColor: '#222222',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placeholderText: {
-    color: '#aaaaaa',
-    fontSize: 16,
   },
   content: {
     padding: 20,

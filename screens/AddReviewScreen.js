@@ -3,7 +3,6 @@ import { useState } from 'react';
 import {
   View,
   Text,
-  Image,
   ScrollView,
   TextInput,
   Pressable,
@@ -13,6 +12,7 @@ import {
 
 import BackButton from '../components/BackButton';
 import FavoriteButton from '../components/FavoriteButton';
+import MoviePoster from '../components/MoviePoster';
 import { addReview, updateReview } from '../services/reviewService';
 
 export default function AddReviewScreen({ route, navigation }) {
@@ -86,19 +86,12 @@ export default function AddReviewScreen({ route, navigation }) {
 
       <View style={styles.content}>
         <View style={styles.movieInfo}>
-          {poster ? (
-            <Image
-              source={{ uri: poster }}
-              style={styles.poster}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={styles.posterPlaceholder}>
-              <Text style={styles.placeholderText}>
-                No image available
-              </Text>
-            </View>
-          )}
+          <MoviePoster
+            uri={poster}
+            width={110}
+            height={165}
+            placeholderFontSize={12}
+          />
 
           <View style={styles.movieDetails}>
             <Text style={styles.title}>{title}</Text>
@@ -218,25 +211,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 16,
-  },
-  poster: {
-    width: 110,
-    height: 165,
-    borderRadius: 6,
-    backgroundColor: '#222222',
-  },
-  posterPlaceholder: {
-    width: 110,
-    height: 165,
-    borderRadius: 6,
-    backgroundColor: '#222222',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  placeholderText: {
-    color: '#aaaaaa',
-    fontSize: 12,
-    textAlign: 'center',
   },
   movieDetails: {
     flex: 1,
