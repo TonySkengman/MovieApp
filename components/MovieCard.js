@@ -1,8 +1,10 @@
 
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
 import FavoriteButton from './FavoriteButton';
 import MoviePoster from './MoviePoster';
+import ShareButton from './ShareButton';
 
 export default function MovieCard({ movie }) {
   const navigation = useNavigation();
@@ -10,6 +12,10 @@ export default function MovieCard({ movie }) {
   function openDetails() {
     navigation.navigate('MovieDetails', { movie });
   }
+
+  const title = movie.Title || movie.title;
+  const year = movie.Year || movie.year;
+  const type = movie.Type || movie.type;
 
   return (
     <View style={styles.movie}>
@@ -25,33 +31,32 @@ export default function MovieCard({ movie }) {
       </Pressable>
 
       <View style={styles.movieInfo}>
-        <Pressable style={styles.details} onPress={openDetails}>
-          <Text style={styles.title}>
-            {movie.Title || movie.title}
-          </Text>
+        <View style={styles.movieInfoRow}>
+          <Pressable style={styles.details} onPress={openDetails}>
+            <Text style={styles.title}>
+              {title}
+            </Text>
 
-          <View style={styles.yearTypeRow}>
             <Text style={styles.year}>
-              {movie.Year || movie.year}
+              {year}
             </Text>
 
             <Text style={styles.type}>
-              {(movie.Type || movie.type) === 'series'
-                ? 'TV Show'
-                : 'Movie'}
+              {type === 'series' ? 'TV Show' : 'Movie'}
             </Text>
+          </Pressable>
+
+          <View style={styles.actionButtons}>
+            <ShareButton movie={movie} />
+            <FavoriteButton movie={movie} />
           </View>
-
-          {movie.genres?.length > 0 && (
-            <Text style={styles.genre}>
-              {movie.genres.join(', ')}
-            </Text>
-          )}
-        </Pressable>
-
-        <View style={styles.favoriteButton}>
-          <FavoriteButton movie={movie} />
         </View>
+
+        {movie.genres?.length > 0 && (
+          <Text style={styles.genre}>
+            {movie.genres.join(', ')}
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -66,25 +71,22 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   movieInfo: {
+    marginTop: 8,
+  },
+  movieInfoRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    gap: 4,
-    marginTop: 8,
+    gap: 8,
   },
   details: {
     flex: 1,
+    minWidth: 0,
+    gap: 4,
   },
   title: {
     color: '#ffffff',
     fontWeight: 'bold',
-  },
-  yearTypeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 4,
   },
   year: {
     color: '#aaaaaa',
@@ -100,7 +102,9 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 12,
   },
-  favoriteButton: {
-    marginTop: 0,
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
 });

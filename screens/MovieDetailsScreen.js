@@ -10,6 +10,7 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 
 import FavoriteButton from '../components/FavoriteButton';
+import ShareButton from '../components/ShareButton';
 import BackButton from '../components/BackButton';
 import MoviePoster from '../components/MoviePoster';
 import { getReviews } from '../services/reviewService';
@@ -82,7 +83,11 @@ export default function MovieDetailsScreen({ route, navigation }) {
       <View style={styles.content}>
         <View style={styles.titleRow}>
           <Text style={styles.title}>{title}</Text>
-          <FavoriteButton movie={movie} />
+
+          <View style={styles.actionButtons}>
+            <ShareButton movie={movie} />
+            <FavoriteButton movie={movie} />
+          </View>
         </View>
 
         <View style={styles.infoRow}>
@@ -189,6 +194,11 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 26,
     fontWeight: 'bold',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   infoRow: {
     flexDirection: 'row',

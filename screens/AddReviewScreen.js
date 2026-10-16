@@ -12,6 +12,7 @@ import {
 
 import BackButton from '../components/BackButton';
 import FavoriteButton from '../components/FavoriteButton';
+import ShareButton from '../components/ShareButton';
 import MoviePoster from '../components/MoviePoster';
 import { addReview, updateReview } from '../services/reviewService';
 
@@ -109,7 +110,8 @@ export default function AddReviewScreen({ route, navigation }) {
               </Text>
             )}
 
-            <View style={styles.favoriteButtonContainer}>
+            <View style={styles.actionButtons}>
+              <ShareButton movie={movie} />
               <FavoriteButton movie={movie} />
             </View>
           </View>
@@ -241,8 +243,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
-  favoriteButtonContainer: {
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-start',
+    gap: 8,
     marginTop: 4,
   },
   sectionTitle: {

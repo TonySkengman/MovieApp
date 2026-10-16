@@ -29,6 +29,8 @@ const genres = [
   'Horror',
   'Sci-Fi',
   'Thriller',
+  'Animation',
+  'Mystery',
 ];
 
 export default function SearchScreen() {

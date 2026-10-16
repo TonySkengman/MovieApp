@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 
 import FavoriteButton from './FavoriteButton';
 import MoviePoster from './MoviePoster';
+import ShareButton from './ShareButton';
 
 export default function MovieRow({ item }) {
   const navigation = useNavigation();
@@ -49,7 +50,8 @@ export default function MovieRow({ item }) {
           )}
         </Pressable>
 
-        <View style={styles.favoriteButton}>
+        <View style={styles.actionButtons}>
+          <ShareButton movie={item} />
           <FavoriteButton movie={item} />
         </View>
       </View>
@@ -93,9 +95,10 @@ const styles = StyleSheet.create({
     color: '#cccccc',
     fontSize: 12,
   },
-  favoriteButton: {
-    alignSelf: 'center',
-    marginTop: 8,
-    marginRight: 15,
+  actionButtons: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+    marginRight: 8,
   },
 });
