@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+
+import { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -35,10 +36,19 @@ const genres = [
   'Mystery',
 ];
 
+const sortOptions = [
+  { label: 'Newest year', value: 'newest' },
+  { label: 'Oldest year', value: 'oldest' },
+  { label: 'Title A–Z', value: 'titleAsc' },
+  { label: 'Title Z–A', value: 'titleDesc' },
+];
+
 export default function SearchScreen() {
   const [query, setQuery] = useState('');
   const [selectedType, setSelectedType] = useState('all');
   const [selectedGenre, setSelectedGenre] = useState('All');
+  const [sortBy, setSortBy] = useState('newest');
+
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -84,6 +94,38 @@ export default function SearchScreen() {
     };
   }, [query, selectedType, selectedGenre, retryCount]);
 
+  const sortedMovies = useMemo(() => {
+    return [...movies].sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest':
+          return (Number(a.year) || 0) - (Number(b.year) || 0);
+
+        case 'titleAsc':
+          return (a.title || '').localeCompare(b.title || '');
+
+        case 'titleDesc':
+          return (b.title || '').localeCompare(a.title || '');
+
+        case 'newest':
+        default:
+          return (Number(b.year) || 0) - (Number(a.year) || 0);
+      }
+    });
+  }, [movies, sortBy]);
+
+  const activeFilterCount = [
+    query.trim() !== '',
+    selectedType !== 'all',
+    selectedGenre !== 'All',
+  ].filter(Boolean).length;
+
+  function clearFilters() {
+    setQuery('');
+    setSelectedType('all');
+    setSelectedGenre('All');
+    setSortBy('newest');
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Search</Text>
@@ -103,7 +145,7 @@ export default function SearchScreen() {
 
       <View style={styles.filterRow}>
         {types.map((type) => (
-          <Text
+          <Pressable
             key={type.value}
             onPress={() => setSelectedType(type.value)}
             style={[
@@ -111,12 +153,20 @@ export default function SearchScreen() {
               selectedType === type.value && styles.selectedChip,
             ]}
             accessibilityRole="button"
+            accessibilityLabel={`Filter by ${type.label}`}
             accessibilityState={{
               selected: selectedType === type.value,
             }}
           >
-            {type.label}
-          </Text>
+            <Text
+              style={[
+                styles.filterText,
+                selectedType === type.value && styles.selectedChipText,
+              ]}
+            >
+              {type.label}
+            </Text>
+          </Pressable>
         ))}
       </View>
 
@@ -129,7 +179,7 @@ export default function SearchScreen() {
         contentContainerStyle={styles.genreScrollContent}
       >
         {genres.map((genre) => (
-          <Text
+          <Pressable
             key={genre}
             onPress={() => setSelectedGenre(genre)}
             style={[
@@ -138,16 +188,86 @@ export default function SearchScreen() {
               selectedGenre === genre && styles.selectedChip,
             ]}
             accessibilityRole="button"
+            accessibilityLabel={`Filter by ${genre}`}
             accessibilityState={{
               selected: selectedGenre === genre,
             }}
           >
-            {genre}
-          </Text>
+            <Text
+              style={[
+                styles.filterText,
+                selectedGenre === genre && styles.selectedChipText,
+              ]}
+            >
+              {genre}
+            </Text>
+          </Pressable>
         ))}
       </ScrollView>
 
-      <Text style={styles.sectionTitle}>Results</Text>
+      <View style={styles.resultsHeader}>
+        <Text style={styles.sectionTitle}>Sort by</Text>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.sortScroll}
+        contentContainerStyle={styles.sortScrollContent}
+      >
+        {sortOptions.map((option) => (
+          <Pressable
+            key={option.value}
+            onPress={() => setSortBy(option.value)}
+            style={[
+              styles.filterChip,
+              styles.sortChip,
+              sortBy === option.value && styles.selectedChip,
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel={`Sort by ${option.label}`}
+            accessibilityState={{
+              selected: sortBy === option.value,
+            }}
+          >
+            <Text
+              style={[
+                styles.filterText,
+                sortBy === option.value && styles.selectedChipText,
+              ]}
+            >
+              {option.label}
+            </Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+
+      <View style={styles.resultsHeader}>
+        <Text style={styles.sectionTitle}>Results</Text>
+
+        {activeFilterCount > 0 && (
+          <Pressable
+            onPress={clearFilters}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Clear search and filters"
+          >
+            <Text style={styles.clearButton}>Clear filters</Text>
+          </Pressable>
+        )}
+      </View>
+
+      {!loading && !error && (
+        <Text style={styles.resultCount}>
+          {sortedMovies.length}{' '}
+          {sortedMovies.length === 1 ? 'result' : 'results'}
+          {activeFilterCount > 0
+            ? ` · ${activeFilterCount} active ${
+                activeFilterCount === 1 ? 'filter' : 'filters'
+              }`
+            : ''}
+        </Text>
+      )}
 
       {loading ? (
         <ActivityIndicator
@@ -163,15 +283,16 @@ export default function SearchScreen() {
             style={styles.retryButton}
             onPress={() => setRetryCount((count) => count + 1)}
             accessibilityRole="button"
+            accessibilityLabel="Try loading titles again"
           >
             <Text style={styles.retryButtonText}>TRY AGAIN</Text>
           </Pressable>
         </View>
-      ) : movies.length === 0 ? (
+      ) : sortedMovies.length === 0 ? (
         <Text style={styles.statusText}>No titles found.</Text>
       ) : (
         <FlatList
-          data={movies}
+          data={sortedMovies}
           renderItem={({ item }) => <MovieRow item={item} />}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.resultsList}
@@ -215,15 +336,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   filterChip: {
-    color: '#dddddd',
+    minHeight: 44,
+    minWidth: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#242424',
-    paddingVertical: 9,
+    paddingVertical: 10,
     paddingHorizontal: 15,
-    borderRadius: 20,
-    overflow: 'hidden',
+    borderRadius: 22,
+  },
+  filterText: {
+    color: '#dddddd',
+    fontSize: 14,
   },
   selectedChip: {
     backgroundColor: '#e50914',
+  },
+  selectedChipText: {
     color: '#ffffff',
   },
   genreScroll: {
@@ -237,6 +366,34 @@ const styles = StyleSheet.create({
   },
   genreChip: {
     marginRight: 8,
+  },
+  sortScroll: {
+    flexGrow: 0,
+    flexShrink: 0,
+    marginBottom: 16,
+  },
+  sortScrollContent: {
+    alignItems: 'center',
+    gap: 8,
+    paddingRight: 4,
+  },
+  sortChip: {
+    marginRight: 0,
+  },
+  resultsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  clearButton: {
+    color: '#ff7777',
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  resultCount: {
+    color: '#888888',
+    fontSize: 13,
+    marginBottom: 8,
   },
   resultsList: {
     paddingBottom: 24,
