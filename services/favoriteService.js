@@ -1,12 +1,11 @@
-
-import { getToken } from './authService';
-import API_BASE_URL from '../constants/api';
+import { getToken } from "./authService";
+import API_BASE_URL from "../config/api";
 
 async function favoritesRequest(endpoint, options = {}) {
   const token = await getToken();
 
   if (!token) {
-    throw new Error('You must be logged in to manage favorites.');
+    throw new Error("You must be logged in to manage favorites.");
   }
 
   const response = await fetch(`${API_BASE_URL}/favorites${endpoint}`, {
@@ -20,24 +19,24 @@ async function favoritesRequest(endpoint, options = {}) {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || 'Something went wrong.');
+    throw new Error(data.message || "Something went wrong.");
   }
 
   return data;
 }
 
 export function getFavorites() {
-  return favoritesRequest('');
+  return favoritesRequest("");
 }
 
 export function addFavorite(movieId) {
   return favoritesRequest(`/${movieId}`, {
-    method: 'POST',
+    method: "POST",
   });
 }
 
 export function removeFavorite(movieId) {
   return favoritesRequest(`/${movieId}`, {
-    method: 'DELETE',
+    method: "DELETE",
   });
 }

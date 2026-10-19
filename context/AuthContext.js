@@ -13,6 +13,8 @@ import {
   logout as logoutUser,
 } from '../services/authService';
 
+import API_BASE_URL from '../config/api';
+
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
@@ -29,7 +31,7 @@ export function AuthProvider({ children }) {
         }
 
         const response = await fetch(
-          'http://10.0.2.2:3000/api/auth/me',
+          `${API_BASE_URL}/auth/me`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

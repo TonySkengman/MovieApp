@@ -88,6 +88,7 @@ function ProfileStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
       <Stack.Screen name="MyReviews" component={MyReviewsScreen} />
+      <Stack.Screen name="MovieDetails" component={MovieDetailsScreen}/>
       <Stack.Screen name="AddReview" component={AddReviewScreen} />
     </Stack.Navigator>
   );

@@ -1,3 +1,4 @@
+
 import { useState, useCallback } from 'react';
 import {
   View,
@@ -59,6 +60,18 @@ export default function MyReviewsScreen() {
     });
   }
 
+  function handleMoviePress(movie) {
+    if (!movie?._id) {
+      Alert.alert(
+        'Movie unavailable',
+        'This movie or series could not be opened.'
+      );
+      return;
+    }
+
+    navigation.navigate('MovieDetails', { movie });
+  }
+
   function handleDelete(review) {
     Alert.alert(
       'Delete review',
@@ -103,7 +116,12 @@ export default function MyReviewsScreen() {
     const movie = item.movie;
 
     return (
-      <View style={styles.reviewCard}>
+      <Pressable
+        style={styles.reviewCard}
+        onPress={() => handleMoviePress(movie)}
+        accessibilityRole="button"
+        accessibilityLabel={`View ${movie?.title || 'movie'}`}
+      >
         <MoviePoster
           uri={movie?.poster}
           width={100}
@@ -138,6 +156,7 @@ export default function MyReviewsScreen() {
               style={styles.editButton}
               onPress={() => handleEdit(item)}
               accessibilityRole="button"
+              accessibilityLabel={`Edit review for ${movie?.title || 'movie'}`}
             >
               <Text style={styles.editButtonText}>
                 Edit review
@@ -149,6 +168,7 @@ export default function MyReviewsScreen() {
               onPress={() => handleDelete(item)}
               disabled={deletingId === item._id}
               accessibilityRole="button"
+              accessibilityLabel={`Delete review for ${movie?.title || 'movie'}`}
             >
               {deletingId === item._id ? (
                 <ActivityIndicator
@@ -163,7 +183,7 @@ export default function MyReviewsScreen() {
             </Pressable>
           </View>
         </View>
-      </View>
+      </Pressable>
     );
   }
 

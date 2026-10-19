@@ -9,10 +9,10 @@ import ShareButton from './ShareButton';
 export default function MovieRow({ item }) {
   const navigation = useNavigation();
 
-  const poster = item.Poster || item.poster;
-  const title = item.Title || item.title;
-  const year = item.Year || item.year;
-  const type = item.Type || item.type;
+  const poster = item.poster;
+  const title = item.title;
+  const year = item.year;
+  const type = item.type;
 
   function openDetails() {
     navigation.navigate('MovieDetails', { movie: item });

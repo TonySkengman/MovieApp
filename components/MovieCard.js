@@ -13,9 +13,9 @@ export default function MovieCard({ movie }) {
     navigation.navigate('MovieDetails', { movie });
   }
 
-  const title = movie.Title || movie.title;
-  const year = movie.Year || movie.year;
-  const type = movie.Type || movie.type;
+  const title = movie.title;
+  const year = movie.year;
+  const type = movie.type;
 
   return (
     <View style={styles.movie}>
