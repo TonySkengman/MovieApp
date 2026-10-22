@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import {
   View,
@@ -7,6 +8,7 @@ import {
   Pressable,
   StyleSheet,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 
 import BackButton from '../components/BackButton';
@@ -15,8 +17,10 @@ import ShareButton from '../components/ShareButton';
 import MoviePoster from '../components/MoviePoster';
 import { addReview, updateReview } from '../services/reviewService';
 import { getUserFriendlyError } from '../utils/errorMessages';
+import { useAuth } from '../context/AuthContext';
 
 export default function AddReviewScreen({ route, navigation }) {
+  const { isLoggedIn, isLoading } = useAuth();
   const { movie, review, isEditing = false } = route.params;
 
   const [rating, setRating] = useState(review?.rating ?? 0);
@@ -32,13 +36,27 @@ export default function AddReviewScreen({ route, navigation }) {
     movie.description || 'No description available.';
 
   async function handleSubmitReview() {
+    if (isLoading || !isLoggedIn) {
+      Alert.alert(
+        'Login required',
+        'You need to log in to add or edit a review.'
+      );
+      return;
+    }
+
     if (rating === 0) {
-      Alert.alert('Missing rating', 'Please select a star rating.');
+      Alert.alert(
+        'Missing rating',
+        'Please select a star rating.'
+      );
       return;
     }
 
     if (!reviewText.trim()) {
-      Alert.alert('Missing review', 'Please enter your review.');
+      Alert.alert(
+        'Missing review',
+        'Please enter your review.'
+      );
       return;
     }
 
@@ -46,23 +64,39 @@ export default function AddReviewScreen({ route, navigation }) {
       setSubmitting(true);
 
       if (isEditing) {
-        await updateReview(review._id, rating, reviewText.trim());
+        await updateReview(
+          review._id,
+          rating,
+          reviewText.trim()
+        );
 
-        Alert.alert('Success', 'Your review has been updated.', [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ]);
+        Alert.alert(
+          'Success',
+          'Your review has been updated.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack(),
+            },
+          ]
+        );
       } else {
-        await addReview(movie._id, rating, reviewText.trim());
+        await addReview(
+          movie._id,
+          rating,
+          reviewText.trim()
+        );
 
-        Alert.alert('Success', 'Your review has been submitted.', [
-          {
-            text: 'OK',
-            onPress: () => navigation.goBack(),
-          },
-        ]);
+        Alert.alert(
+          'Success',
+          'Your review has been submitted.',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack(),
+            },
+          ]
+        );
       }
     } catch (error) {
       Alert.alert(
@@ -79,6 +113,44 @@ export default function AddReviewScreen({ route, navigation }) {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  // Wait until authentication status has been restored.
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator
+          size="large"
+          color="#e50914"
+        />
+      </View>
+    );
+  }
+
+  // Prevent logged-out users from accessing the review form.
+  if (!isLoggedIn) {
+    return (
+      <View style={styles.loginContainer}>
+        <Text style={styles.loginTitle}>
+          Login required
+        </Text>
+
+        <Text style={styles.loginMessage}>
+          You need to log in to add or edit reviews.
+        </Text>
+
+        <Pressable
+          style={styles.loginButton}
+          onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
+          <Text style={styles.loginButtonText}>
+            Go Back
+          </Text>
+        </Pressable>
+      </View>
+    );
   }
 
   return (
@@ -106,6 +178,7 @@ export default function AddReviewScreen({ route, navigation }) {
 
             <View style={styles.infoRow}>
               <Text style={styles.year}>{year}</Text>
+
               <Text style={styles.type}>
                 {type === 'series' ? 'TV Show' : 'Movie'}
               </Text>
@@ -124,14 +197,21 @@ export default function AddReviewScreen({ route, navigation }) {
           </View>
         </View>
 
-        <Text style={styles.sectionTitle}>Overview</Text>
-        <Text style={styles.description}>{description}</Text>
+        <Text style={styles.sectionTitle}>
+          Overview
+        </Text>
+
+        <Text style={styles.description}>
+          {description}
+        </Text>
 
         <Text style={styles.sectionTitle}>
           {isEditing ? 'Edit Review' : 'Add Review'}
         </Text>
 
-        <Text style={styles.label}>Your rating</Text>
+        <Text style={styles.label}>
+          Your rating
+        </Text>
 
         <View style={styles.ratingSelector}>
           {[1, 2, 3, 4, 5].map((value) => (
@@ -140,7 +220,9 @@ export default function AddReviewScreen({ route, navigation }) {
               onPress={() => setRating(value)}
               accessibilityRole="button"
               accessibilityLabel={`${value} out of 5 stars`}
-              accessibilityState={{ selected: rating === value }}
+              accessibilityState={{
+                selected: rating === value,
+              }}
             >
               <Text
                 style={[
@@ -154,7 +236,9 @@ export default function AddReviewScreen({ route, navigation }) {
           ))}
         </View>
 
-        <Text style={styles.label}>Your review</Text>
+        <Text style={styles.label}>
+          Your review
+        </Text>
 
         <TextInput
           style={styles.reviewInput}
@@ -180,6 +264,9 @@ export default function AddReviewScreen({ route, navigation }) {
           onPress={handleSubmitReview}
           disabled={submitting}
           accessibilityRole="button"
+          accessibilityLabel={
+            isEditing ? 'Save changes' : 'Submit review'
+          }
         >
           <Text style={styles.submitButtonText}>
             {submitting
@@ -204,6 +291,48 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 30,
   },
+
+  // Authentication loading screen
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: '#101010',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  // Screen shown when the user is not logged in
+  loginContainer: {
+    flex: 1,
+    backgroundColor: '#101010',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  loginTitle: {
+    color: '#ffffff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  loginMessage: {
+    color: '#aaaaaa',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  loginButton: {
+    backgroundColor: '#e50914',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+  },
+  loginButtonText: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontWeight: 'bold',
+  },
+
+  // Existing screen styles
   header: {
     height: 120,
     alignItems: 'center',
