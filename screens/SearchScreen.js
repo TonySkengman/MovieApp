@@ -10,6 +10,7 @@ import {
   FlatList,
   Pressable,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { searchMovies } from '../services/movieService';
 import MovieRow from '../components/MovieRow';
@@ -48,6 +49,7 @@ export default function SearchScreen() {
   const [selectedType, setSelectedType] = useState('all');
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
+  const [showFilters, setShowFilters] = useState(true);
 
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -130,117 +132,148 @@ export default function SearchScreen() {
     <View style={styles.container}>
       <Text style={styles.heading}>Search</Text>
 
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search for a movie or TV show..."
-        placeholderTextColor="#888888"
-        value={query}
-        onChangeText={setQuery}
-        autoCapitalize="none"
-        returnKeyType="search"
-        accessibilityLabel="Search for a movie or TV show"
-      />
+      <View style={styles.searchRow}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search for a movie or TV show..."
+          placeholderTextColor="#888888"
+          value={query}
+          onChangeText={setQuery}
+          autoCapitalize="none"
+          returnKeyType="search"
+          accessibilityLabel="Search for a movie or TV show"
+        />
 
-      <Text style={styles.sectionTitle}>Type</Text>
-
-      <View style={styles.filterRow}>
-        {types.map((type) => (
-          <Pressable
-            key={type.value}
-            onPress={() => setSelectedType(type.value)}
-            style={[
-              styles.filterChip,
-              selectedType === type.value && styles.selectedChip,
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel={`Filter by ${type.label}`}
-            accessibilityState={{
-              selected: selectedType === type.value,
-            }}
-          >
-            <Text
-              style={[
-                styles.filterText,
-                selectedType === type.value && styles.selectedChipText,
-              ]}
-            >
-              {type.label}
-            </Text>
-          </Pressable>
-        ))}
+        <Pressable
+          style={[
+            styles.filterToggle,
+            showFilters && styles.filterToggleActive,
+          ]}
+          onPress={() => setShowFilters((visible) => !visible)}
+          accessibilityRole="button"
+          accessibilityLabel={
+            showFilters ? 'Hide filters' : 'Show filters'
+          }
+          accessibilityState={{ expanded: showFilters }}
+        >
+          <Ionicons
+            name="options-outline"
+            size={24}
+            color="#ffffff"
+          />
+        </Pressable>
       </View>
 
-      <Text style={styles.sectionTitle}>Genre</Text>
+      {showFilters && (
+        <>
+          <Text style={styles.sectionTitle}>Type</Text>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.genreScroll}
-        contentContainerStyle={styles.genreScrollContent}
-      >
-        {genres.map((genre) => (
-          <Pressable
-            key={genre}
-            onPress={() => setSelectedGenre(genre)}
-            style={[
-              styles.filterChip,
-              styles.genreChip,
-              selectedGenre === genre && styles.selectedChip,
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel={`Filter by ${genre}`}
-            accessibilityState={{
-              selected: selectedGenre === genre,
-            }}
+          <View style={styles.filterRow}>
+            {types.map((type) => (
+              <Pressable
+                key={type.value}
+                onPress={() => setSelectedType(type.value)}
+                style={[
+                  styles.filterChip,
+                  selectedType === type.value &&
+                    styles.selectedChip,
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={`Filter by ${type.label}`}
+                accessibilityState={{
+                  selected: selectedType === type.value,
+                }}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    selectedType === type.value &&
+                      styles.selectedChipText,
+                  ]}
+                >
+                  {type.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
+          <Text style={styles.sectionTitle}>Genre</Text>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.genreScroll}
+            contentContainerStyle={styles.genreScrollContent}
           >
-            <Text
-              style={[
-                styles.filterText,
-                selectedGenre === genre && styles.selectedChipText,
-              ]}
-            >
-              {genre}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+            {genres.map((genre) => (
+              <Pressable
+                key={genre}
+                onPress={() => setSelectedGenre(genre)}
+                style={[
+                  styles.filterChip,
+                  styles.genreChip,
+                  selectedGenre === genre &&
+                    styles.selectedChip,
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={`Filter by ${genre}`}
+                accessibilityState={{
+                  selected: selectedGenre === genre,
+                }}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    selectedGenre === genre &&
+                      styles.selectedChipText,
+                  ]}
+                >
+                  {genre}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
 
-      <View style={styles.resultsHeader}>
-        <Text style={styles.sectionTitle}>Sort by</Text>
-      </View>
+          <View style={styles.resultsHeader}>
+            <Text style={styles.sectionTitle}>Sort by</Text>
+          </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.sortScroll}
-        contentContainerStyle={styles.sortScrollContent}
-      >
-        {sortOptions.map((option) => (
-          <Pressable
-            key={option.value}
-            onPress={() => setSortBy(option.value)}
-            style={[
-              styles.filterChip,
-              styles.sortChip,
-              sortBy === option.value && styles.selectedChip,
-            ]}
-            accessibilityRole="button"
-            accessibilityLabel={`Sort by ${option.label}`}
-            accessibilityState={{
-              selected: sortBy === option.value,
-            }}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.sortScroll}
+            contentContainerStyle={styles.sortScrollContent}
           >
-            <Text
-              style={[
-                styles.filterText,
-                sortBy === option.value && styles.selectedChipText,
-              ]}
-            >
-              {option.label}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+            {sortOptions.map((option) => (
+              <Pressable
+                key={option.value}
+                onPress={() => setSortBy(option.value)}
+                style={[
+                  styles.filterChip,
+                  styles.sortChip,
+                  sortBy === option.value &&
+                    styles.selectedChip,
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={`Sort by ${option.label}`}
+                accessibilityState={{
+                  selected: sortBy === option.value,
+                }}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    sortBy === option.value &&
+                      styles.selectedChipText,
+                  ]}
+                >
+                  {option.label}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </>
+      )}
 
       <View style={styles.resultsHeader}>
         <Text style={styles.sectionTitle}>Results</Text>
@@ -252,7 +285,9 @@ export default function SearchScreen() {
             accessibilityRole="button"
             accessibilityLabel="Clear search and filters"
           >
-            <Text style={styles.clearButton}>Clear filters</Text>
+            <Text style={styles.clearButton}>
+              Clear filters
+            </Text>
           </Pressable>
         )}
       </View>
@@ -281,19 +316,27 @@ export default function SearchScreen() {
 
           <Pressable
             style={styles.retryButton}
-            onPress={() => setRetryCount((count) => count + 1)}
+            onPress={() =>
+              setRetryCount((count) => count + 1)
+            }
             accessibilityRole="button"
             accessibilityLabel="Try loading titles again"
           >
-            <Text style={styles.retryButtonText}>TRY AGAIN</Text>
+            <Text style={styles.retryButtonText}>
+              TRY AGAIN
+            </Text>
           </Pressable>
         </View>
       ) : sortedMovies.length === 0 ? (
-        <Text style={styles.statusText}>No titles found.</Text>
+        <Text style={styles.statusText}>
+          No titles found.
+        </Text>
       ) : (
         <FlatList
           data={sortedMovies}
-          renderItem={({ item }) => <MovieRow item={item} />}
+          renderItem={({ item }) => (
+            <MovieRow item={item} />
+          )}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.resultsList}
           keyboardShouldPersistTaps="handled"
@@ -316,13 +359,31 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 18,
   },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 20,
+  },
   searchInput: {
+    flex: 1,
+    minWidth: 0,
     backgroundColor: '#242424',
     color: '#ffffff',
     padding: 14,
     borderRadius: 8,
     fontSize: 16,
-    marginBottom: 20,
+  },
+  filterToggle: {
+    width: 50,
+    height: 50,
+    backgroundColor: '#242424',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterToggleActive: {
+    backgroundColor: '#e50914',
   },
   sectionTitle: {
     color: '#ffffff',
