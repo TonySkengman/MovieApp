@@ -1,4 +1,3 @@
-
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -20,7 +19,11 @@ export default function MovieRow({ item }) {
 
   return (
     <View style={styles.movieCard}>
-      <Pressable onPress={openDetails}>
+      <Pressable
+        onPress={openDetails}
+        accessibilityRole="button"
+        accessibilityLabel={`View details for ${title}, ${year}`}
+      >
         <MoviePoster
           uri={poster}
           width={100}
@@ -31,7 +34,14 @@ export default function MovieRow({ item }) {
       </Pressable>
 
       <View style={styles.movieInfo}>
-        <Pressable style={styles.details} onPress={openDetails}>
+        <Pressable
+          style={styles.details}
+          onPress={openDetails}
+          accessibilityRole="button"
+          accessibilityLabel={`View details for ${title}, ${year}, ${
+            type === 'series' ? 'TV show' : 'movie'
+          }`}
+        >
           <Text style={styles.movieTitle}>
             {title}
           </Text>

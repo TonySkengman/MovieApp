@@ -95,6 +95,8 @@ export default function SignupScreen({ navigation }) {
         style={[styles.button, isLoading && styles.buttonDisabled]}
         onPress={handleSignup}
         disabled={isLoading}
+        accessibilityRole="button"
+        accessibilityLabel="Create account"
       >
         {isLoading ? (
           <ActivityIndicator color="#ffffff" />

@@ -17,9 +17,15 @@ export default function MovieCard({ movie }) {
   const year = movie.year;
   const type = movie.type;
 
+  const movieType = type === 'series' ? 'TV show' : 'movie';
+
   return (
     <View style={styles.movie}>
-      <Pressable onPress={openDetails}>
+      <Pressable
+        onPress={openDetails}
+        accessibilityRole="button"
+        accessibilityLabel={`View details for ${title}, ${year}, ${movieType}`}
+      >
         <View style={styles.posterContainer}>
           <MoviePoster
             uri={movie.Poster || movie.poster}
@@ -32,7 +38,12 @@ export default function MovieCard({ movie }) {
 
       <View style={styles.movieInfo}>
         <View style={styles.movieInfoRow}>
-          <Pressable style={styles.details} onPress={openDetails}>
+          <Pressable
+            style={styles.details}
+            onPress={openDetails}
+            accessibilityRole="button"
+            accessibilityLabel={`View details for ${title}, ${year}, ${movieType}`}
+          >
             <Text style={styles.title}>
               {title}
             </Text>

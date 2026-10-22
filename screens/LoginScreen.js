@@ -92,6 +92,8 @@ export default function LoginScreen({ navigation, route }) {
         style={[styles.button, isLoading && styles.buttonDisabled]}
         onPress={handleLogin}
         disabled={isLoading}
+        accessibilityRole="button"
+        accessibilityLabel="Log in"
       >
         {isLoading ? (
           <ActivityIndicator color="#ffffff" />

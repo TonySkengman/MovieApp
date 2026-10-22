@@ -13,7 +13,11 @@ export default function LoginPrompt({ message, onLogin }) {
 
       <Text style={styles.text}>{message}</Text>
 
-      <Pressable style={styles.button} onPress={onLogin}>
+      <Pressable
+       style={styles.button}  
+       onPress={onLogin}
+       accesibilityRole="button"
+       accessibilityLabel='Log in to access this feature'> 
         <Text style={styles.buttonText}>Log in</Text>
       </Pressable>
     </View>

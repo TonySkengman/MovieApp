@@ -121,6 +121,7 @@ export default function MovieDetailsScreen({ route, navigation }) {
           style={styles.addReviewButton}
           onPress={handleAddReview}
           accessibilityRole="button"
+          accessibilityLabel={`Add a review for ${title}`}
         >
           <Text style={styles.addReviewButtonText}>
             ADD REVIEW
