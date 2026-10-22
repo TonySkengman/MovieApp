@@ -1,10 +1,22 @@
 
 import { useState, useCallback } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  Pressable,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import {
+  useFocusEffect,
+  useNavigation,
+} from '@react-navigation/native';
+
 import { useAuth } from '../context/AuthContext';
 import { getMyReviews } from '../services/reviewService';
 import { getFavorites } from '../services/favoriteService';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
@@ -13,7 +25,13 @@ export default function ProfileScreen() {
   const [reviewCount, setReviewCount] = useState(null);
   const [averageRating, setAverageRating] = useState(null);
   const [favoriteCount, setFavoriteCount] = useState(null);
-  const [mostFavoritedGenre, setMostFavoritedGenre] = useState(null);
+  const [mostFavoritedGenre, setMostFavoritedGenre] =
+    useState(null);
+
+  const [loading, setLoading] = useState(true);
+  const [reviewsError, setReviewsError] = useState('');
+  const [favoritesError, setFavoritesError] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
 
   const username = user?.username || 'Unknown user';
 
@@ -22,79 +40,110 @@ export default function ProfileScreen() {
       let isActive = true;
 
       async function loadProfileStats() {
-        try {
-          const reviews = await getMyReviews();
+        setLoading(true);
+        setReviewsError('');
+        setFavoritesError('');
 
-          if (isActive) {
-            setReviewCount(reviews.length);
+        const [reviewsResult, favoritesResult] =
+          await Promise.allSettled([
+            getMyReviews(),
+            getFavorites(),
+          ]);
 
-            if (reviews.length > 0) {
-              const totalRating = reviews.reduce(
-                (total, review) => total + review.rating,
-                0
-              );
-
-              setAverageRating(
-                (totalRating / reviews.length).toFixed(1)
-              );
-            } else {
-              setAverageRating(null);
-            }
-          }
-        } catch (error) {
-          console.error('Could not load reviews:', error);
-
-          if (isActive) {
-            setReviewCount(null);
-            setAverageRating(null);
-          }
+        if (!isActive) {
+          return;
         }
 
-        try {
-          const response = await getFavorites();
+        // Handle review statistics
+        if (reviewsResult.status === 'fulfilled') {
+          const reviews = reviewsResult.value;
+
+          setReviewCount(reviews.length);
+
+          if (reviews.length > 0) {
+            const totalRating = reviews.reduce(
+              (total, review) => total + review.rating,
+              0
+            );
+
+            setAverageRating(
+              (totalRating / reviews.length).toFixed(1)
+            );
+          } else {
+            setAverageRating(null);
+          }
+        } else {
+          console.error(
+            'Could not load reviews:',
+            reviewsResult.reason
+          );
+
+          setReviewCount(null);
+          setAverageRating(null);
+
+          setReviewsError(
+            getUserFriendlyError(
+              reviewsResult.reason,
+              'Could not load your review statistics.'
+            )
+          );
+        }
+
+        // Handle favorite statistics
+        if (favoritesResult.status === 'fulfilled') {
+          const response = favoritesResult.value;
 
           const favorites = Array.isArray(response)
             ? response
             : response.favorites || [];
 
-          if (isActive) {
-            setFavoriteCount(favorites.length);
+          setFavoriteCount(favorites.length);
 
-            const genreCounts = {};
+          const genreCounts = {};
 
-            favorites.forEach((favorite) => {
-              const movie = favorite.movie || favorite;
-              const genres = movie.genres || [];
+          favorites.forEach((favorite) => {
+            const movie = favorite.movie || favorite;
+            const genres = movie.genres || [];
 
-              genres.forEach((genre) => {
-                genreCounts[genre] = (genreCounts[genre] || 0) + 1;
-              });
+            genres.forEach((genre) => {
+              genreCounts[genre] =
+                (genreCounts[genre] || 0) + 1;
             });
+          });
 
-            const sortedGenres = Object.entries(genreCounts).sort(
-              (a, b) => b[1] - a[1]
-            );
+          const sortedGenres = Object.entries(
+            genreCounts
+          ).sort((a, b) => b[1] - a[1]);
 
-            if (sortedGenres.length > 0) {
-              const highestCount = sortedGenres[0][1];
+          if (sortedGenres.length > 0) {
+            const highestCount = sortedGenres[0][1];
 
-              const topGenres = sortedGenres
-                .filter(([, count]) => count === highestCount)
-                .map(([genre]) => genre);
+            const topGenres = sortedGenres
+              .filter(([, count]) => count === highestCount)
+              .map(([genre]) => genre);
 
-              setMostFavoritedGenre(topGenres.join(', '));
-            } else {
-              setMostFavoritedGenre(null);
-            }
-          }
-        } catch (error) {
-          console.error('Could not load favorites:', error);
-
-          if (isActive) {
-            setFavoriteCount(null);
+            setMostFavoritedGenre(topGenres.join(', '));
+          } else {
             setMostFavoritedGenre(null);
           }
+        } else {
+          console.error(
+            'Could not load favorites:',
+            favoritesResult.reason
+          );
+
+          setFavoriteCount(null);
+          setMostFavoritedGenre(null);
+
+          setFavoritesError(
+            getUserFriendlyError(
+              favoritesResult.reason,
+              'Could not load your favorite statistics.'
+            )
+          );
         }
+
+        setLoading(false);
       }
 
       loadProfileStats();
@@ -102,11 +151,20 @@ export default function ProfileScreen() {
       return () => {
         isActive = false;
       };
-    }, [])
+    }, [retryCount])
   );
 
+  function handleRetry() {
+    setRetryCount((count) => count + 1);
+  }
+
+  const hasError = Boolean(reviewsError || favoritesError);
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+    >
       <Text style={styles.title}>Profile</Text>
 
       <View style={styles.profileHeader}>
@@ -117,67 +175,141 @@ export default function ProfileScreen() {
         </View>
 
         <Text style={styles.username}>{username}</Text>
-        <Text style={styles.subtitle}>Watchlist account</Text>
+
+        <Text style={styles.subtitle}>
+          Watchlist account
+        </Text>
       </View>
 
       <Text style={styles.sectionTitle}>My Activity</Text>
 
+      {/* Loading indicator */}
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator
+            size="small"
+            color="#e50914"
+          />
+          <Text style={styles.loadingText}>
+            Loading your activity...
+          </Text>
+        </View>
+      )}
+
+      {/* Error messages */}
+      {!loading && hasError && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorTitle}>
+            Could not load all profile statistics
+          </Text>
+
+          {reviewsError !== '' && (
+            <Text style={styles.errorText}>
+              Reviews: {reviewsError}
+            </Text>
+          )}
+
+          {favoritesError !== '' && (
+            <Text style={styles.errorText}>
+              Favorites: {favoritesError}
+            </Text>
+          )}
+
+          <Pressable
+            style={styles.retryButton}
+            onPress={handleRetry}
+            accessibilityRole="button"
+            accessibilityLabel="Retry loading profile statistics"
+          >
+            <Text style={styles.retryButtonText}>
+              TRY AGAIN
+            </Text>
+          </Pressable>
+        </View>
+      )}
+
       <View style={styles.statsContainer}>
+        {/* Reviews Made */}
         <Pressable
           style={styles.statsCard}
           onPress={() => navigation.navigate('MyReviews')}
           accessibilityRole="button"
-          accessibilityLabel={`Reviews Made: ${reviewCount ?? 'unknown'}`}
+          accessibilityLabel={`Reviews Made: ${
+            reviewCount ?? 'unknown'
+          }`}
         >
           <View style={styles.statsIcon}>
             <Text style={styles.reviewIcon}>★</Text>
           </View>
 
-          <Text style={styles.statsLabel}>Reviews Made</Text>
+          <Text style={styles.statsLabel}>
+            Reviews Made
+          </Text>
+
           <Text style={styles.statsValue}>
-            {reviewCount === null ? '—' : reviewCount}
+            {loading || reviewCount === null
+              ? '—'
+              : reviewCount}
           </Text>
         </Pressable>
 
+        {/* Favorites */}
         <Pressable
           style={styles.statsCard}
           onPress={() => navigation.navigate('Favorites')}
           accessibilityRole="button"
-          accessibilityLabel={`Favorites: ${favoriteCount ?? 'unknown'}`}
+          accessibilityLabel={`Favorites: ${
+            favoriteCount ?? 'unknown'
+          }`}
         >
           <View style={styles.statsIcon}>
             <Text style={styles.favoriteIcon}>♥</Text>
           </View>
 
-          <Text style={styles.statsLabel}>Favorites</Text>
+          <Text style={styles.statsLabel}>
+            Favorites
+          </Text>
+
           <Text style={styles.statsValue}>
-            {favoriteCount === null ? '—' : favoriteCount}
+            {loading || favoriteCount === null
+              ? '—'
+              : favoriteCount}
           </Text>
         </Pressable>
 
+        {/* Average Rating */}
         <View style={styles.statsCard}>
           <View style={styles.statsIcon}>
             <Text style={styles.ratingIcon}>★</Text>
           </View>
 
-          <Text style={styles.statsLabel}>Average Rating</Text>
+          <Text style={styles.statsLabel}>
+            Average Rating
+          </Text>
+
           <Text style={styles.statsValue}>
-            {averageRating === null ? '—' : `${averageRating}/5`}
+            {loading || averageRating === null
+              ? '—'
+              : `${averageRating}/5`}
           </Text>
         </View>
 
+        {/* Most Favorited Genre */}
         <View style={styles.statsCard}>
           <View style={styles.statsIcon}>
             <Text style={styles.genreIcon}>🎬</Text>
           </View>
 
-          <Text style={styles.statsLabel}>Most Favorited Genre</Text>
+          <Text style={styles.statsLabel}>
+            Most Favorited Genre
+          </Text>
+
           <Text
             style={styles.genreValue}
             numberOfLines={3}
             adjustsFontSizeToFit
           >
-            {mostFavoritedGenre || '—'}
+            {loading ? '—' : mostFavoritedGenre || '—'}
           </Text>
         </View>
       </View>
@@ -187,19 +319,25 @@ export default function ProfileScreen() {
           style={styles.reviewsButton}
           onPress={() => navigation.navigate('MyReviews')}
           accessibilityRole="button"
+          accessibilityLabel="My Reviews"
         >
-          <Text style={styles.reviewsButtonText}>My Reviews</Text>
+          <Text style={styles.reviewsButtonText}>
+            My Reviews
+          </Text>
         </Pressable>
 
         <Pressable
           style={styles.logoutButton}
           onPress={logout}
           accessibilityRole="button"
+          accessibilityLabel="Log out"
         >
-          <Text style={styles.logoutButtonText}>Log out</Text>
+          <Text style={styles.logoutButtonText}>
+            Log out
+          </Text>
         </Pressable>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -207,6 +345,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#101010',
+  },
+  scrollContent: {
+    flexGrow: 1,
     paddingTop: 55,
     paddingHorizontal: 16,
     paddingBottom: 24,
@@ -311,8 +452,60 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+
+  // Loading styles
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    paddingVertical: 18,
+  },
+  loadingText: {
+    color: '#aaaaaa',
+    fontSize: 14,
+  },
+
+  // Error styles
+  errorContainer: {
+    backgroundColor: '#241819',
+    borderWidth: 1,
+    borderColor: '#743034',
+    borderRadius: 10,
+    padding: 16,
+    marginBottom: 20,
+    alignItems: 'center',
+  },
+  errorTitle: {
+    color: '#ff7777',
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  errorText: {
+    color: '#cccccc',
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  retryButton: {
+    backgroundColor: '#e50914',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  retryButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+
+  // Bottom buttons
   bottomSection: {
     marginTop: 'auto',
+    paddingTop: 24,
     gap: 12,
     alignItems: 'center',
   },
