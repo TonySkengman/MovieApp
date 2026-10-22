@@ -1,5 +1,4 @@
-
-import { Pressable, Share, StyleSheet } from 'react-native';
+import { Pressable, Share, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function ShareButton({ movie }) {
@@ -15,6 +14,11 @@ export default function ShareButton({ movie }) {
       });
     } catch (error) {
       console.error('Could not share movie:', error);
+
+      Alert.alert(
+        'Sharing failed',
+        'Could not share this movie. Please try again.'
+      );
     }
   }
 
