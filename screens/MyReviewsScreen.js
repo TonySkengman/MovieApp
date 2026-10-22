@@ -95,6 +95,12 @@ export default function MyReviewsScreen() {
                   (item) => item._id !== review._id
                 )
               );
+              
+              Alert.alert(
+                'Success',
+                'Your review has been deleted.'
+              );
+              
             } catch (err) {
               Alert.alert(
                 'Error',
