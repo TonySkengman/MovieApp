@@ -34,7 +34,7 @@ The **backend** and **Expo app** run in separate terminals.
 Clone the GitHub repository:
 
 ```bash
-git clone https://github.com/TonySkengman/MovieApp.git
+git clone https://github.com/TonySkengman/MovieApp
 cd MovieApp
 ```
 
