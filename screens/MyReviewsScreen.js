@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import {
   View,
@@ -16,7 +15,7 @@ import {
 
 import { getMyReviews, deleteReview } from '../services/reviewService';
 import BackButton from '../components/BackButton';
-import MoviePoster from '../components/MoviePoster';
+import ReviewCard from '../components/ReviewCard';
 import { getUserFriendlyError } from '../utils/errorMessages';
 
 export default function MyReviewsScreen() {
@@ -95,12 +94,11 @@ export default function MyReviewsScreen() {
                   (item) => item._id !== review._id
                 )
               );
-              
+
               Alert.alert(
                 'Success',
                 'Your review has been deleted.'
               );
-              
             } catch (err) {
               Alert.alert(
                 'Error',
@@ -119,77 +117,14 @@ export default function MyReviewsScreen() {
   }
 
   function renderReview({ item }) {
-    const movie = item.movie;
-
     return (
-      <Pressable
-        style={styles.reviewCard}
-        onPress={() => handleMoviePress(movie)}
-        accessibilityRole="button"
-        accessibilityLabel={`View ${movie?.title || 'movie'}`}
-      >
-        <MoviePoster
-          uri={movie?.poster}
-          width={100}
-          height={150}
-          placeholderText="No poster"
-          placeholderFontSize={12}
-        />
-
-        <View style={styles.reviewContent}>
-          <Text style={styles.movieTitle}>
-            {movie?.title || 'Unknown movie'}
-          </Text>
-
-          {movie?.year ? (
-            <Text style={styles.movieYear}>{movie.year}</Text>
-          ) : null}
-
-          <Text style={styles.rating}>
-            {'★'.repeat(item.rating)}
-            <Text style={styles.emptyStars}>
-              {'☆'.repeat(5 - item.rating)}
-            </Text>
-            <Text style={styles.ratingNumber}>
-              {' '}{item.rating}/5
-            </Text>
-          </Text>
-
-          <Text style={styles.reviewText}>{item.text}</Text>
-
-          <View style={styles.reviewActions}>
-            <Pressable
-              style={styles.editButton}
-              onPress={() => handleEdit(item)}
-              accessibilityRole="button"
-              accessibilityLabel={`Edit review for ${movie?.title || 'movie'}`}
-            >
-              <Text style={styles.editButtonText}>
-                Edit review
-              </Text>
-            </Pressable>
-
-            <Pressable
-              style={styles.deleteButton}
-              onPress={() => handleDelete(item)}
-              disabled={deletingId === item._id}
-              accessibilityRole="button"
-              accessibilityLabel={`Delete review for ${movie?.title || 'movie'}`}
-            >
-              {deletingId === item._id ? (
-                <ActivityIndicator
-                  color="#ffffff"
-                  size="small"
-                />
-              ) : (
-                <Text style={styles.deleteButtonText}>
-                  Delete review
-                </Text>
-              )}
-            </Pressable>
-          </View>
-        </View>
-      </Pressable>
+      <ReviewCard
+        review={item}
+        onPress={() => handleMoviePress(item.movie)}
+        onEdit={() => handleEdit(item)}
+        onDelete={() => handleDelete(item)}
+        deleting={deletingId === item._id}
+      />
     );
   }
 
@@ -217,6 +152,7 @@ export default function MyReviewsScreen() {
             style={styles.retryButton}
             onPress={loadReviews}
             accessibilityRole="button"
+            accessibilityLabel="Try loading reviews again"
           >
             <Text style={styles.retryButtonText}>
               Try again
@@ -270,82 +206,6 @@ const styles = StyleSheet.create({
   emptyList: {
     flexGrow: 1,
     justifyContent: 'center',
-  },
-  reviewCard: {
-    flexDirection: 'row',
-    backgroundColor: '#1c1c1c',
-    borderRadius: 10,
-    padding: 12,
-    gap: 14,
-  },
-  reviewContent: {
-    flex: 1,
-    alignItems: 'flex-start',
-  },
-  movieTitle: {
-    color: '#ffffff',
-    fontSize: 17,
-    fontWeight: 'bold',
-  },
-  movieYear: {
-    color: '#888888',
-    fontSize: 13,
-    marginTop: 3,
-  },
-  rating: {
-    color: '#f5c518',
-    fontSize: 18,
-    marginTop: 8,
-  },
-  emptyStars: {
-    color: '#666666',
-  },
-  ratingNumber: {
-    color: '#aaaaaa',
-    fontSize: 13,
-  },
-  reviewText: {
-    color: '#dddddd',
-    fontSize: 14,
-    lineHeight: 20,
-    marginTop: 8,
-    flexShrink: 1,
-  },
-  reviewActions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 12,
-  },
-  editButton: {
-    backgroundColor: '#252525',
-    borderWidth: 1,
-    borderColor: '#444444',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minHeight: 34,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  editButtonText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: 'bold',
-  },
-  deleteButton: {
-    backgroundColor: '#e50914',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    minHeight: 34,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  deleteButtonText: {
-    color: '#ffffff',
-    fontSize: 13,
-    fontWeight: 'bold',
   },
   centerContent: {
     flex: 1,
